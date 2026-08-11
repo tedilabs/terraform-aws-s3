@@ -1,30 +1,30 @@
 # Modules
-":floppy_disk: s3-access-point":
+":floppy_disk: access-point":
 - changed-files:
   - any-glob-to-any-file:
-    - modules/s3-access-point/**/*
+    - modules/access-point/**/*
 
-":floppy_disk: s3-bucket":
+":floppy_disk: bucket":
 - changed-files:
   - any-glob-to-any-file:
-    - modules/s3-bucket/**/*
+    - modules/bucket/**/*
 
-":floppy_disk: s3-objects":
+":floppy_disk: objects":
 - changed-files:
   - any-glob-to-any-file:
-    - modules/s3-objects/**/*
+    - modules/objects/**/*
 
-":floppy_disk: s3-table":
+":floppy_disk: table":
 - changed-files:
   - any-glob-to-any-file:
-    - modules/s3-table/**/*
+    - modules/table/**/*
 
-":floppy_disk: s3-table-bucket":
+":floppy_disk: table-bucket":
 - changed-files:
   - any-glob-to-any-file:
-    - modules/s3-table-bucket/**/*
+    - modules/table-bucket/**/*
 
-":floppy_disk: s3-vector-bucket":
+":floppy_disk: vector-bucket":
 - changed-files:
   - any-glob-to-any-file:
-    - modules/s3-vector-bucket/**/*
+    - modules/vector-bucket/**/*

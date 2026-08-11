@@ -6,12 +6,12 @@
 
 Terraform module which creates S3 related resources on AWS.
 
-- [s3-access-point](./modules/s3-access-point)
-- [s3-bucket](./modules/s3-bucket)
-- [s3-objects](./modules/s3-objects)
-- [s3-table](./modules/s3-table)
-- [s3-table-bucket](./modules/s3-table-bucket)
-- [s3-vector-bucket](./modules/s3-vector-bucket)
+- [access-point](./modules/access-point)
+- [bucket](./modules/bucket)
+- [objects](./modules/objects)
+- [table](./modules/table)
+- [table-bucket](./modules/table-bucket)
+- [vector-bucket](./modules/vector-bucket)
 
 
 ## Target AWS Services
@@ -35,25 +35,25 @@ Terraform Modules from [this package](https://github.com/tedilabs/terraform-aws-
 
 ### S3 Bucket
 
-- [Full S3 Bucket](./examples/s3-bucket-full)
-- [S3 Bucket with Access Logging](./examples/s3-bucket-access-logging)
-- [S3 Bucket with Server-Side Encryption](./examples/s3-bucket-encryption)
-- [S3 Bucket with Lifecycle Rules](./examples/s3-bucket-lifecycle-rules)
-- [S3 Bucket with Objects](./examples/s3-bucket-objects)
-- [S3 Bucket with Versioning](./examples/s3-bucket-versioning)
+- [Full S3 Bucket](./examples/bucket-full)
+- [S3 Bucket with Access Logging](./examples/bucket-access-logging)
+- [S3 Bucket with Server-Side Encryption](./examples/bucket-encryption)
+- [S3 Bucket with Lifecycle Rules](./examples/bucket-lifecycle-rules)
+- [S3 Bucket with Objects](./examples/bucket-objects)
+- [S3 Bucket with Versioning](./examples/bucket-versioning)
 
 ### S3 Access Point
 
-- [S3 Access Point (Internet Access)](./examples/s3-access-point-internet)
-- [S3 Access Point (VPC Access)](./examples/s3-access-point-vpc)
+- [S3 Access Point (Internet Access)](./examples/access-point-internet)
+- [S3 Access Point (VPC Access)](./examples/access-point-vpc)
 
 ### S3 Tables
 
-- [S3 Table Bucket with Table](./examples/s3-table-bucket)
+- [S3 Table Bucket with Table](./examples/table-bucket)
 
 ### S3 Vectors
 
-- [S3 Vector Bucket](./examples/s3-vector-bucket)
+- [S3 Vector Bucket](./examples/vector-bucket)
 
 
 ## Self Promotion
