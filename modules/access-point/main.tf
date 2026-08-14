@@ -1,11 +1,29 @@
+locals {
+  metadata = {
+    package = "terraform-aws-s3"
+    version = trimspace(file("${path.module}/../../VERSION"))
+    module  = basename(path.module)
+    name    = var.name
+  }
+  module_tags = var.module_tags_enabled ? {
+    "module.terraform.io/package"   = local.metadata.package
+    "module.terraform.io/version"   = local.metadata.version
+    "module.terraform.io/name"      = local.metadata.module
+    "module.terraform.io/full-name" = "${local.metadata.package}/${local.metadata.module}"
+    "module.terraform.io/instance"  = local.metadata.name
+  } : {}
+}
+
+
 ###################################################
 # S3 Access Point
 ###################################################
 
-# INFO: Not supported attributes
-# - `account_id`
 resource "aws_s3_access_point" "this" {
-  name = var.name
+  region = var.region
+
+  account_id = var.account_id
+  name       = var.name
 
   bucket            = var.bucket.name
   bucket_account_id = var.bucket.account_id
@@ -24,6 +42,14 @@ resource "aws_s3_access_point" "this" {
     block_public_policy     = (var.block_public_access.enabled || var.block_public_access.block_public_policy_enabled)
     restrict_public_buckets = (var.block_public_access.enabled || var.block_public_access.restrict_public_buckets_enabled)
   }
+
+  tags = merge(
+    {
+      "Name" = local.metadata.name
+    },
+    local.module_tags,
+    var.tags,
+  )
 
   lifecycle {
     precondition {
@@ -46,7 +72,9 @@ resource "aws_s3_access_point" "this" {
 ###################################################
 
 resource "aws_s3control_access_point_policy" "this" {
-  count = var.policy != "" ? 1 : 0
+  count = var.policy != null && var.policy != "" ? 1 : 0
+
+  region = var.region
 
   access_point_arn = aws_s3_access_point.this.arn
   policy           = var.policy
