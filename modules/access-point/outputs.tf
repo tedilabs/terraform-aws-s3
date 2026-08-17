@@ -3,11 +3,6 @@ output "region" {
   value       = aws_s3_access_point.this.region
 }
 
-output "account_id" {
-  description = "The AWS account ID that owns the S3 Access Point."
-  value       = aws_s3_access_point.this.account_id
-}
-
 output "name" {
   description = "The name of the S3 Access Point."
   value       = aws_s3_access_point.this.name

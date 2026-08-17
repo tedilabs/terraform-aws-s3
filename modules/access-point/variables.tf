@@ -5,13 +5,6 @@ variable "region" {
   nullable    = true
 }
 
-variable "account_id" {
-  description = "(Optional) The AWS account ID for the owner of the bucket for which to create the access point. If not provided, the account ID is automatically determined from the AWS provider configuration."
-  type        = string
-  default     = null
-  nullable    = true
-}
-
 variable "name" {
   description = "(Required) A name you want to assign to this access point. Access point names must be unique within the account for this Region."
   type        = string

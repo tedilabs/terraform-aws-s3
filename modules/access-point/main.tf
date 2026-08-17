@@ -19,13 +19,14 @@ locals {
 # S3 Access Point
 ###################################################
 
+# INFO: Not supported attributes
+# - `account_id` (pinned to the provider's account)
 # INFO: Use a separate resource
 # - `policy`
 resource "aws_s3_access_point" "this" {
   region = var.region
 
-  account_id = var.account_id
-  name       = var.name
+  name = var.name
 
   bucket            = var.bucket.name
   bucket_account_id = var.bucket.account_id
