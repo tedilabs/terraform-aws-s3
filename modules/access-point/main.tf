@@ -19,6 +19,8 @@ locals {
 # S3 Access Point
 ###################################################
 
+# INFO: Use a separate resource
+# - `policy`
 resource "aws_s3_access_point" "this" {
   region = var.region
 
