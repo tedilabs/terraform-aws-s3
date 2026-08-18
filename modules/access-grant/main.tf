@@ -19,28 +19,41 @@ locals {
 # S3 Access Grant
 ###################################################
 
+locals {
+  prefix_type = {
+    "PREFIX" = null
+    "OBJECT" = "Object"
+  }
+}
+
+# INFO: Not supported attributes
+# - `account_id`
+# - `application_arn`
 resource "aws_s3control_access_grant" "this" {
   region = var.region
 
-  access_grants_location_id = var.location_id
+  access_grants_location_id = var.location
   permission                = var.permission
-  s3_prefix_type            = var.s3_prefix_type
-
-  dynamic "access_grants_location_configuration" {
-    for_each = var.s3_sub_prefix != null ? [var.s3_sub_prefix] : []
-
-    content {
-      s3_sub_prefix = access_grants_location_configuration.value
-    }
-  }
 
   grantee {
     grantee_type       = var.grantee.type
     grantee_identifier = var.grantee.identifier
   }
 
+  s3_prefix_type = local.prefix_type[var.scope.type]
+
+  dynamic "access_grants_location_configuration" {
+    for_each = var.scope.sub_prefix != null ? [var.scope.sub_prefix] : []
+
+    content {
+      s3_sub_prefix = access_grants_location_configuration.value
+    }
+  }
+
   tags = merge(
-    { "Name" = local.metadata.name },
+    {
+      "Name" = local.metadata.name
+    },
     local.module_tags,
     var.tags,
   )

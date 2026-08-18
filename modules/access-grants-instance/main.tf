@@ -3,7 +3,7 @@ locals {
     package = "terraform-aws-s3"
     version = trimspace(file("${path.module}/../../VERSION"))
     module  = basename(path.module)
-    name    = var.name
+    name    = local.region
   }
   module_tags = var.module_tags_enabled ? {
     "module.terraform.io/package"   = local.metadata.package
@@ -14,15 +14,28 @@ locals {
   } : {}
 }
 
+data "aws_region" "this" {
+  region = var.region
+}
+
+locals {
+  region = data.aws_region.this.region
+}
+
 
 ###################################################
 # S3 Access Grants Instance
 ###################################################
 
+# INFO: Not supported attributes
+# - `account_id`
 resource "aws_s3control_access_grants_instance" "this" {
   region = var.region
 
-  identity_center_arn = var.identity_center_arn
+  identity_center_arn = (var.iam_identity_center.enabled
+    ? var.iam_identity_center.instance
+    : null
+  )
 
   tags = merge(
     {
@@ -38,11 +51,15 @@ resource "aws_s3control_access_grants_instance" "this" {
 # Resource Policy for S3 Access Grants Instance
 ###################################################
 
+# INFO: The resource policy is a singleton of the account and the region, and
+# doesn't reference the S3 Access Grants instance. Use `depends_on` to create
+# the S3 Access Grants instance first.
 resource "aws_s3control_access_grants_instance_resource_policy" "this" {
   count = var.policy != null ? 1 : 0
 
-  depends_on = [aws_s3control_access_grants_instance.this]
-
   region = var.region
+
   policy = var.policy
+
+  depends_on = [aws_s3control_access_grants_instance.this]
 }

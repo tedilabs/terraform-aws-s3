@@ -4,12 +4,12 @@ output "region" {
 }
 
 output "name" {
-  description = "The name of this module instance."
-  value       = var.name
+  description = "The name of the S3 Access Grant."
+  value       = local.metadata.name
 }
 
 output "id" {
-  description = "The unique ID of the S3 Access Grant."
+  description = "The ID of the S3 Access Grant."
   value       = aws_s3control_access_grant.this.access_grant_id
 }
 
@@ -18,31 +18,45 @@ output "arn" {
   value       = aws_s3control_access_grant.this.access_grant_arn
 }
 
-output "scope" {
-  description = "The effective scope of the S3 Access Grant."
-  value       = aws_s3control_access_grant.this.grant_scope
+output "location" {
+  description = "The ID of the S3 Access Grants location which this grant is created in."
+  value       = aws_s3control_access_grant.this.access_grants_location_id
 }
 
 output "permission" {
-  description = "The level of access granted."
+  description = "The level of access which is granted to the S3 data."
   value       = aws_s3control_access_grant.this.permission
 }
 
 output "grantee" {
-  description = "The identity receiving access."
+  description = "The grantee which receives the access to the S3 data."
   value = {
-    type       = aws_s3control_access_grant.this.grantee[0].grantee_type
-    identifier = aws_s3control_access_grant.this.grantee[0].grantee_identifier
+    type       = one(aws_s3control_access_grant.this.grantee[*].grantee_type)
+    identifier = one(aws_s3control_access_grant.this.grantee[*].grantee_identifier)
+  }
+}
+
+output "scope" {
+  description = "The scope of the S3 Access Grant."
+  value = {
+    type       = aws_s3control_access_grant.this.s3_prefix_type == local.prefix_type["OBJECT"] ? "OBJECT" : "PREFIX"
+    sub_prefix = one(aws_s3control_access_grant.this.access_grants_location_configuration[*].s3_sub_prefix)
+    path       = aws_s3control_access_grant.this.grant_scope
   }
 }
 
 output "resource_group" {
   description = "The resource group created to manage resources in this module."
   value = merge(
-    { enabled = var.resource_group.enabled && var.module_tags_enabled },
+    {
+      enabled = var.resource_group.enabled && var.module_tags_enabled
+    },
     (var.resource_group.enabled && var.module_tags_enabled
-      ? { arn = module.resource_group[0].arn, name = module.resource_group[0].name }
+      ? {
+        arn  = module.resource_group[0].arn
+        name = module.resource_group[0].name
+      }
       : {}
-    ),
+    )
   )
 }

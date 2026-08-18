@@ -12,75 +12,18 @@ locals {
     "module.terraform.io/full-name" = "${local.metadata.package}/${local.metadata.module}"
     "module.terraform.io/instance"  = local.metadata.name
   } : {}
-  iam_role_arn = var.iam_role.enabled ? aws_iam_role.this[0].arn : var.iam_role_arn
 }
 
 data "aws_caller_identity" "this" {}
-
-
-###################################################
-# IAM Role for S3 Access Grants Location
-###################################################
-
-data "aws_iam_policy_document" "assume_role" {
-  count = var.iam_role.enabled ? 1 : 0
-
-  statement {
-    effect = "Allow"
-    actions = [
-      "sts:AssumeRole",
-      "sts:SetContext",
-      "sts:SetSourceIdentity",
-    ]
-
-    principals {
-      type        = "Service"
-      identifiers = ["access-grants.s3.amazonaws.com"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = [data.aws_caller_identity.this.account_id]
-    }
-
-    condition {
-      test     = "ArnEquals"
-      variable = "aws:SourceArn"
-      values   = [var.access_grants_instance_arn]
-    }
-  }
+data "aws_partition" "this" {}
+data "aws_region" "this" {
+  region = var.region
 }
 
-resource "aws_iam_role" "this" {
-  count = var.iam_role.enabled ? 1 : 0
-
-  name                 = coalesce(var.iam_role.name, "s3-access-grants-${var.name}")
-  path                 = var.iam_role.path
-  description          = var.iam_role.description
-  permissions_boundary = var.iam_role.permissions_boundary
-  assume_role_policy   = data.aws_iam_policy_document.assume_role[0].json
-
-  tags = merge(
-    { "Name" = coalesce(var.iam_role.name, "s3-access-grants-${var.name}") },
-    local.module_tags,
-    var.tags,
-  )
-}
-
-resource "aws_iam_role_policy_attachment" "this" {
-  for_each = var.iam_role.enabled ? var.iam_role.policies : toset([])
-
-  role       = aws_iam_role.this[0].name
-  policy_arn = each.value
-}
-
-resource "aws_iam_role_policy" "this" {
-  for_each = var.iam_role.enabled ? var.iam_role.inline_policies : {}
-
-  role   = aws_iam_role.this[0].name
-  name   = each.key
-  policy = each.value
+locals {
+  account_id = data.aws_caller_identity.this.account_id
+  partition  = data.aws_partition.this.partition
+  region     = data.aws_region.this.region
 }
 
 
@@ -88,22 +31,40 @@ resource "aws_iam_role_policy" "this" {
 # S3 Access Grants Location
 ###################################################
 
+locals {
+  # The location scope is one of the default location `s3://`, a bucket
+  # `s3://bucket/`, or a bucket with a prefix `s3://bucket/prefix`.
+  scope_path   = trimprefix(var.location_scope, "s3://")
+  scope_parts  = split("/", local.scope_path)
+  scope_bucket = local.scope_parts[0]
+  scope_prefix = join("/", slice(local.scope_parts, 1, length(local.scope_parts)))
+
+  default_scope_enabled = local.scope_bucket == ""
+
+  iam_role = (var.default_iam_role.enabled
+    ? one(aws_iam_role.this[*].arn)
+    : var.iam_role
+  )
+}
+
 resource "aws_s3control_access_grants_location" "this" {
   region = var.region
 
-  iam_role_arn   = local.iam_role_arn
   location_scope = var.location_scope
+  iam_role_arn   = local.iam_role
 
   tags = merge(
-    { "Name" = local.metadata.name },
+    {
+      "Name" = local.metadata.name
+    },
     local.module_tags,
     var.tags,
   )
 
   lifecycle {
     precondition {
-      condition     = var.iam_role.enabled || var.iam_role_arn != null
-      error_message = "`iam_role_arn` is required when `iam_role.enabled` is `false`."
+      condition     = var.default_iam_role.enabled || var.iam_role != null
+      error_message = "`iam_role` is required when the value of `default_iam_role.enabled` is `false`."
     }
   }
 }
