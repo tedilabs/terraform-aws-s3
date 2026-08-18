@@ -7,6 +7,9 @@
 Terraform module which creates S3 related resources on AWS.
 
 - [access-point](./modules/access-point)
+- [access-grant](./modules/access-grant)
+- [access-grants-instance](./modules/access-grants-instance)
+- [access-grants-location](./modules/access-grants-location)
 - [bucket](./modules/bucket)
 - [objects](./modules/objects)
 - [table](./modules/table)
@@ -21,6 +24,7 @@ Terraform Modules from [this package](https://github.com/tedilabs/terraform-aws-
 - **AWS S3**
   - S3 Bucket
   - S3 Access Point
+  - S3 Access Grants
   - S3 Object
   - S3 Tables
     - Table Bucket
@@ -46,6 +50,10 @@ Terraform Modules from [this package](https://github.com/tedilabs/terraform-aws-
 
 - [S3 Access Point (Internet Access)](./examples/access-point-internet)
 - [S3 Access Point (VPC Access)](./examples/access-point-vpc)
+
+### S3 Access Grants
+
+- [S3 Access Grants](./examples/access-grants)
 
 ### S3 Tables
 
