@@ -6,6 +6,7 @@
 
 Terraform module which creates S3 related resources on AWS.
 
+- [access-grants-instance](./modules/access-grants-instance)
 - [access-point](./modules/access-point)
 - [bucket](./modules/bucket)
 - [objects](./modules/objects)
@@ -20,6 +21,8 @@ Terraform Modules from [this package](https://github.com/tedilabs/terraform-aws-
 
 - **AWS S3**
   - S3 Bucket
+  - S3 Access Grants
+    - Access Grants Instance
   - S3 Access Point
   - S3 Object
   - S3 Tables
@@ -41,6 +44,10 @@ Terraform Modules from [this package](https://github.com/tedilabs/terraform-aws-
 - [S3 Bucket with Lifecycle Rules](./examples/bucket-lifecycle-rules)
 - [S3 Bucket with Objects](./examples/bucket-objects)
 - [S3 Bucket with Versioning](./examples/bucket-versioning)
+
+### S3 Access Grants
+
+- [S3 Access Grants Instance](./examples/access-grants-instance)
 
 ### S3 Access Point
 
