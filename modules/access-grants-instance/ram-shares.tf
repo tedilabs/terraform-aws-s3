@@ -2,7 +2,8 @@ locals {
   ram_share_name_prefix = join(".", [
     "s3",
     "access-grants",
-    replace(local.region, "/[^a-zA-Z0-9_\\.-]/", "-"),
+    "instance",
+    replace(local.metadata.name, "/[^a-zA-Z0-9_\\.-]/", "-"),
   ])
 }
 
