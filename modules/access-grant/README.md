@@ -17,7 +17,7 @@ This module creates following resources.
 | Name | Version |
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.57 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.0 |
 
 ## Providers
 
