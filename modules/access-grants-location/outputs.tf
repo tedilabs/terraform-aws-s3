@@ -18,7 +18,7 @@ output "arn" {
   value       = aws_s3control_access_grants_location.this.access_grants_location_arn
 }
 
-output "location_scope" {
+output "scope" {
   description = "The S3 URI of the registered location."
   value       = aws_s3control_access_grants_location.this.location_scope
 }
@@ -26,24 +26,6 @@ output "location_scope" {
 output "iam_role" {
   description = "The ARN of the IAM role that S3 Access Grants assumes to vend temporary credentials for the location."
   value       = aws_s3control_access_grants_location.this.iam_role_arn
-}
-
-output "default_iam_role" {
-  description = "The configuration of the default IAM role created for the S3 Access Grants location."
-  value = merge(
-    {
-      enabled = var.default_iam_role.enabled
-    },
-    (var.default_iam_role.enabled
-      ? {
-        arn        = aws_iam_role.this[0].arn
-        name       = aws_iam_role.this[0].name
-        permission = var.default_iam_role.permission
-        kms_keys   = var.default_iam_role.kms_keys
-      }
-      : {}
-    )
-  )
 }
 
 output "resource_group" {

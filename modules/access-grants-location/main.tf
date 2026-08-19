@@ -3,7 +3,7 @@ locals {
     package = "terraform-aws-s3"
     version = trimspace(file("${path.module}/../../VERSION"))
     module  = basename(path.module)
-    name    = var.name
+    name    = var.scope
   }
   module_tags = var.module_tags_enabled ? {
     "module.terraform.io/package"   = local.metadata.package
@@ -38,13 +38,13 @@ locals {
 # S3 Access Grants Location
 ###################################################
 
-# INFO: Not supported attributes
-# - `account_id`
 resource "aws_s3control_access_grants_location" "this" {
   region = var.region
 
+  account_id = local.account_id
+
+  location_scope = var.scope
   iam_role_arn   = local.iam_role
-  location_scope = var.location_scope
 
   tags = merge(
     {

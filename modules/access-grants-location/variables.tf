@@ -5,19 +5,14 @@ variable "region" {
   nullable    = true
 }
 
-variable "name" {
-  description = "(Required) A name of the S3 Access Grants location. The name is only used for the `Name` tag, the default IAM role name and module metadata."
+variable "scope" {
+  description = "(Optional) The S3 URI of the location to register. The default S3 URI `s3://` covers all S3 buckets in the current AWS account in the region. Use `s3://<bucket>` for a specific bucket, or `s3://<bucket>/<prefix>` for a specific prefix of the bucket. The S3 data must be in the same region as the S3 Access Grants instance. Defaults to `s3://`."
   type        = string
   nullable    = false
-}
-
-variable "location_scope" {
-  description = "(Required) The S3 URI of the location to register. The default S3 URI `s3://` covers all S3 buckets in the current AWS account in the region. Use `s3://<bucket>` for a specific bucket, or `s3://<bucket>/<prefix>` for a specific prefix of the bucket. The S3 data must be in the same region as the S3 Access Grants instance."
-  type        = string
-  nullable    = false
+  default     = "s3://"
 
   validation {
-    condition     = startswith(var.location_scope, "s3://")
+    condition     = startswith(var.scope, "s3://")
     error_message = "`location_scope` must be a valid S3 URI starting with `s3://`."
   }
 }
