@@ -42,6 +42,27 @@ variable "module_tags_enabled" {
 
 
 ###################################################
+# Resource Sharing by RAM (Resource Access Manager)
+###################################################
+
+variable "shares" {
+  description = "(Optional) A list of resource shares via RAM (Resource Access Manager)."
+  type = list(object({
+    name = optional(string)
+
+    permissions = optional(set(string), ["AWSRAMDefaultPermissionAccessGrants"])
+
+    external_principals_allowed = optional(bool, false)
+    principals                  = optional(set(string), [])
+
+    tags = optional(map(string), {})
+  }))
+  default  = []
+  nullable = false
+}
+
+
+###################################################
 # Resource Group
 ###################################################
 
