@@ -28,7 +28,7 @@ locals {
   region     = data.aws_region.this.region
 
   iam_role = (var.default_iam_role.enabled
-    ? one(aws_iam_role.this[*].arn)
+    ? one(module.default_iam_role[*].arn)
     : var.iam_role
   )
 }

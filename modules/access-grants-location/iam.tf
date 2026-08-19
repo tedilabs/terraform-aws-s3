@@ -1,7 +1,7 @@
 locals {
   instance_arn = "arn:${local.partition}:s3:${local.region}:${local.account_id}:access-grants/default"
 
-  scope       = trimprefix(var.location_scope, "s3://")
+  scope       = trimprefix(var.scope, "s3://")
   scope_parts = split("/", local.scope)
   bucket      = local.scope_parts[0]
   key_prefix  = trimsuffix(join("/", slice(local.scope_parts, 1, length(local.scope_parts))), "*")
@@ -18,42 +18,24 @@ locals {
 
   read_enabled  = contains(["READ", "READWRITE"], var.default_iam_role.permission)
   write_enabled = contains(["WRITE", "READWRITE"], var.default_iam_role.permission)
+
+  default_iam_role_name = coalesce(
+    var.default_iam_role.name,
+    join("-", [
+      "s3-access-grants",
+      (local.default_scope_enabled
+        ? "default"
+        : trimsuffix(replace(local.scope, "/[^a-zA-Z0-9_.-]/", "-"), "-")
+      ),
+      "location",
+    ]),
+  )
 }
 
 
 ###################################################
 # IAM Role for S3 Access Grants Location
 ###################################################
-
-data "aws_iam_policy_document" "trust" {
-  count = var.default_iam_role.enabled ? 1 : 0
-
-  statement {
-    sid    = "AllowAccessGrantsToAssumeRole"
-    effect = "Allow"
-    actions = [
-      "sts:AssumeRole",
-      "sts:SetSourceIdentity",
-      "sts:SetContext",
-    ]
-
-    principals {
-      type        = "Service"
-      identifiers = ["access-grants.s3.amazonaws.com"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = [local.account_id]
-    }
-    condition {
-      test     = "ArnLike"
-      variable = "aws:SourceArn"
-      values   = ["arn:${local.partition}:s3:*:${local.account_id}:access-grants/default"]
-    }
-  }
-}
 
 data "aws_iam_policy_document" "access" {
   count = var.default_iam_role.enabled ? 1 : 0
@@ -171,45 +153,52 @@ data "aws_iam_policy_document" "access" {
   }
 }
 
-resource "aws_iam_role" "this" {
+module "default_iam_role" {
   count = var.default_iam_role.enabled ? 1 : 0
 
-  name        = coalesce(var.default_iam_role.name, "s3-access-grants-${local.metadata.name}-location")
+  source  = "tedilabs/account/aws//modules/iam-role"
+  version = "~> 0.33.11"
+
+  name        = local.default_iam_role_name
   path        = var.default_iam_role.path
   description = var.default_iam_role.description
 
-  assume_role_policy    = data.aws_iam_policy_document.trust[0].json
-  permissions_boundary  = var.default_iam_role.permissions_boundary
+  trusted_service_policies = [
+    {
+      services = ["access-grants.s3.amazonaws.com"]
+      conditions = [
+        {
+          key       = "aws:SourceAccount"
+          condition = "StringEquals"
+          values    = [local.account_id]
+        },
+        {
+          key       = "aws:SourceArn"
+          condition = "ArnLike"
+          values    = ["arn:${local.partition}:s3:*:${local.account_id}:access-grants/default"]
+        },
+      ]
+    }
+  ]
+  trusted_session_context = {
+    enabled = true
+  }
+
+  policies = var.default_iam_role.policies
+  inline_policies = merge({
+    "s3-access-grants-location" = data.aws_iam_policy_document.access[0].json
+  }, var.default_iam_role.inline_policies)
+
+  permissions_boundary = var.default_iam_role.permissions_boundary
+
   force_detach_policies = true
+  resource_group = {
+    enabled = false
+  }
+  module_tags_enabled = false
 
   tags = merge(
-    {
-      "Name" = coalesce(var.default_iam_role.name, "s3-access-grants-${local.metadata.name}-location")
-    },
     local.module_tags,
     var.tags,
   )
-}
-
-resource "aws_iam_role_policy" "access" {
-  count = var.default_iam_role.enabled ? 1 : 0
-
-  role   = aws_iam_role.this[0].id
-  name   = "s3-access-grants-location"
-  policy = data.aws_iam_policy_document.access[0].json
-}
-
-resource "aws_iam_role_policy" "custom" {
-  for_each = var.default_iam_role.enabled ? var.default_iam_role.inline_policies : {}
-
-  role   = aws_iam_role.this[0].id
-  name   = each.key
-  policy = each.value
-}
-
-resource "aws_iam_role_policy_attachment" "this" {
-  for_each = var.default_iam_role.enabled ? toset(var.default_iam_role.policies) : toset([])
-
-  role       = aws_iam_role.this[0].id
-  policy_arn = each.value
 }

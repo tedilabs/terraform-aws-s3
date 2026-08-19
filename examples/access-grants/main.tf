@@ -52,8 +52,7 @@ module "location" {
   # source  = "tedilabs/s3/aws//modules/access-grants-location"
   # version = "~> 0.1.0"
 
-  name           = "example"
-  location_scope = "s3://${module.bucket.name}"
+  scope = "s3://${module.bucket.name}"
 
   tags = {
     "project" = "terraform-aws-s3-examples"

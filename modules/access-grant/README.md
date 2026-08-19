@@ -36,6 +36,7 @@ This module creates following resources.
 | Name | Type |
 | ---- | ---- |
 | [aws_s3control_access_grant.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3control_access_grant) | resource |
+| [aws_caller_identity.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 
 ## Inputs
 

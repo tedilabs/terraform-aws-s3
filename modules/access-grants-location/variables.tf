@@ -13,7 +13,7 @@ variable "scope" {
 
   validation {
     condition     = startswith(var.scope, "s3://")
-    error_message = "`location_scope` must be a valid S3 URI starting with `s3://`."
+    error_message = "`scope` must be a valid S3 URI starting with `s3://`."
   }
 }
 
@@ -26,9 +26,9 @@ variable "iam_role" {
 
 variable "default_iam_role" {
   description = <<EOF
-  (Optional) A configuration for the default IAM role for the S3 Access Grants location. S3 Access Grants assumes this role to vend temporary credentials scoped down to the individual grant. The trust policy only allows the S3 Access Grants service principal of the current account, and the permissions follow the AWS recommended policy scoped to `location_scope`. Use `iam_role` if `default_iam_role.enabled` is `false`. `default_iam_role` as defined below.
+  (Optional) A configuration for the default IAM role for the S3 Access Grants location. S3 Access Grants assumes this role to vend temporary credentials scoped down to the individual grant. The trust policy only allows the S3 Access Grants service principal of the current account, and the permissions follow the AWS recommended policy scoped to `scope`. Use `iam_role` if `default_iam_role.enabled` is `false`. `default_iam_role` as defined below.
     (Optional) `enabled` - Whether to create the default IAM role. Defaults to `true`.
-    (Optional) `name` - The name of the default IAM role. Defaults to `s3-access-grants-$${var.name}-location`.
+    (Optional) `name` - The name of the default IAM role. If not provided, a name will be generated from the location scope.
     (Optional) `path` - The path of the default IAM role. Defaults to `/`.
     (Optional) `description` - The description of the default IAM role.
     (Optional) `permission` - The maximum level of access which the role allows within the location scope. Access grants for the location can only narrow this down. Valid values are `READ`, `WRITE` and `READWRITE`. Defaults to `READWRITE`.
