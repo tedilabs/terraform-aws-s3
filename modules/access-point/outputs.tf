@@ -1,3 +1,8 @@
+output "region" {
+  description = "The AWS region this module resources resides in."
+  value       = aws_s3_access_point.this.region
+}
+
 output "name" {
   description = "The name of the S3 Access Point."
   value       = aws_s3_access_point.this.name
@@ -19,7 +24,7 @@ output "alias" {
 }
 
 output "bucket" {
-  description = "The bucket assoicated to this Access Point."
+  description = "The bucket associated with this Access Point."
   value = {
     name       = aws_s3_access_point.this.bucket
     account_id = aws_s3_access_point.this.bucket_account_id
@@ -29,6 +34,14 @@ output "bucket" {
 output "network_origin" {
   description = "Indicates whether this access point allows access from the public Internet. Values are `VPC` (the access point doesn't allow access from the public Internet) and `INTERNET` (the access point allows access from the public Internet, subject to the access point and bucket access policies)."
   value       = upper(aws_s3_access_point.this.network_origin)
+}
+
+output "has_public_access_policy" {
+  description = "Whether this access point currently has a policy that allows public access."
+  value = (var.policy != null && var.policy != ""
+    ? one(aws_s3control_access_point_policy.this[*].has_public_access_policy)
+    : aws_s3_access_point.this.has_public_access_policy
+  )
 }
 
 output "vpc_id" {
@@ -54,4 +67,20 @@ output "block_public_access" {
     block_public_policy_enabled     = one(aws_s3_access_point.this.public_access_block_configuration[*]).block_public_policy
     restrict_public_buckets_enabled = one(aws_s3_access_point.this.public_access_block_configuration[*]).restrict_public_buckets
   }
+}
+
+output "resource_group" {
+  description = "The resource group created to manage resources in this module."
+  value = merge(
+    {
+      enabled = var.resource_group.enabled && var.module_tags_enabled
+    },
+    (var.resource_group.enabled && var.module_tags_enabled
+      ? {
+        arn  = module.resource_group[0].arn
+        name = module.resource_group[0].name
+      }
+      : {}
+    )
+  )
 }

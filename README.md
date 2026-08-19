@@ -23,11 +23,11 @@ Terraform Modules from [this package](https://github.com/tedilabs/terraform-aws-
 
 - **AWS S3**
   - S3 Bucket
-  - S3 Access Point
   - S3 Access Grants
     - Access Grants Instance
     - Access Grants Location
     - Access Grant
+  - S3 Access Point
   - S3 Object
   - S3 Tables
     - Table Bucket
@@ -49,14 +49,15 @@ Terraform Modules from [this package](https://github.com/tedilabs/terraform-aws-
 - [S3 Bucket with Objects](./examples/bucket-objects)
 - [S3 Bucket with Versioning](./examples/bucket-versioning)
 
+### S3 Access Grants
+
+- [S3 Access Grants Instance](./examples/access-grants-instance)
+- [S3 Access Grants Location with a Grant](./examples/access-grants)
+
 ### S3 Access Point
 
 - [S3 Access Point (Internet Access)](./examples/access-point-internet)
 - [S3 Access Point (VPC Access)](./examples/access-point-vpc)
-
-### S3 Access Grants
-
-- [S3 Access Grants with an IAM Grantee](./examples/access-grants)
 
 ### S3 Tables
 
