@@ -42,27 +42,6 @@ variable "module_tags_enabled" {
 
 
 ###################################################
-# Resource Sharing by RAM (Resource Access Manager)
-###################################################
-
-variable "shares" {
-  description = "(Optional) A list of resource shares via RAM (Resource Access Manager)."
-  type = list(object({
-    name = optional(string)
-
-    permissions = optional(set(string), ["AWSRAMDefaultPermissionAccessGrants"])
-
-    external_principals_allowed = optional(bool, false)
-    principals                  = optional(set(string), [])
-
-    tags = optional(map(string), {})
-  }))
-  default  = []
-  nullable = false
-}
-
-
-###################################################
 # Resource Group
 ###################################################
 
@@ -79,5 +58,36 @@ variable "resource_group" {
     description = optional(string, "Managed by Terraform.")
   })
   default  = {}
+  nullable = false
+}
+
+
+###################################################
+# Resource Sharing by RAM (Resource Access Manager)
+###################################################
+
+variable "shares" {
+  description = <<EOF
+  (Optional) A list of resource shares via RAM (Resource Access Manager). `shares` as defined below.
+    (Optional) `name` - The name of the resource share.
+    (Optional) `permissions` - A set of AWS RAM managed permissions to associate with the resource share. Defaults to `AWSRAMPermissionAccessGrantsData`. The following permissions are available for S3 Access Grants:
+      `AWSRAMPermissionAccessGrantsData` - Allows principals to request data access credentials and find or list the grants available to the caller. Use this default permission when consumers only need to access data through S3 Access Grants.
+      `AWSRAMPermissionAccessGrantsReadAccess` - Includes the data access permissions and allows principals to list all grants and registered locations in the shared instance. Use this when consumers need data access and read-only visibility into the instance configuration.
+      `AWSRAMPermissionAccessGrantsControl` - Allows principals to list grants and registered locations without requesting data access credentials. Use this when consumers only need read-only visibility into the instance control plane.
+    (Optional) `external_principals_allowed` - Whether to allow principals outside of the AWS Organization to associate with the resource share. Defaults to `false`.
+    (Optional) `principals` - A set of principals to associate with the resource share. Defaults to `[]`.
+    (Optional) `tags` - A map of tags to add to the resource share. Defaults to `{}`.
+  EOF
+  type = list(object({
+    name = optional(string)
+
+    permissions = optional(set(string), ["AWSRAMPermissionAccessGrantsData"])
+
+    external_principals_allowed = optional(bool, false)
+    principals                  = optional(set(string), [])
+
+    tags = optional(map(string), {})
+  }))
+  default  = []
   nullable = false
 }
