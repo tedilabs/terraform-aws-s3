@@ -1,7 +1,13 @@
 # Modules
 - color: "fbca04"
+  description: "This issue or pull request is related to access-grant module."
+  name: ":floppy_disk: access-grant"
+- color: "fbca04"
   description: "This issue or pull request is related to access-grants-instance module."
   name: ":floppy_disk: access-grants-instance"
+- color: "fbca04"
+  description: "This issue or pull request is related to access-grants-location module."
+  name: ":floppy_disk: access-grants-location"
 - color: "fbca04"
   description: "This issue or pull request is related to access-point module."
   name: ":floppy_disk: access-point"
