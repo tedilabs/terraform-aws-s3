@@ -3,9 +3,9 @@ output "region" {
   value       = aws_s3control_access_grant.this.region
 }
 
-output "name" {
-  description = "The name of the S3 Access Grant."
-  value       = local.metadata.name
+output "owner" {
+  description = "The account ID of the account that owns the S3 Access Grants instance of this grant."
+  value       = aws_s3control_access_grant.this.account_id
 }
 
 output "id" {

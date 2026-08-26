@@ -6,7 +6,7 @@ variable "region" {
 }
 
 variable "name" {
-  description = "(Required) Desired name for the S3 Access Grant. S3 Access Grants doesn't support to name the grant, so this name is only used to name the module resources like the resource tags and the Resource Group."
+  description = "(Required) Desired name for the S3 Access Grant. S3 Access Grants doesn't support to name a grant, so this name is only used to name the module resources like the resource tags and the Resource Group."
   type        = string
   nullable    = false
 }

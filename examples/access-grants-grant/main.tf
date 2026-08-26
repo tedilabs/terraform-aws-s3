@@ -4,14 +4,14 @@ provider "aws" {
 
 
 ###################################################
-# S3 Bucket for the Data Lake
+# S3 Bucket
 ###################################################
 
 data "aws_caller_identity" "this" {}
 
 locals {
-  bucket_name = "access-grants-example-${local.account_id}"
   account_id  = data.aws_caller_identity.this.account_id
+  bucket_name = "access-grants-grant-example-${local.account_id}"
 }
 
 module "bucket" {
@@ -32,10 +32,7 @@ module "bucket" {
 # S3 Access Grants Instance
 ###################################################
 
-## The S3 Access Grants instance is a singleton of the region of the account.
-## Associate an IAM Identity Center instance with `iam_identity_center` to
-## create grants for the corporate directory users and groups.
-module "access_grants_instance" {
+module "instance" {
   source = "../../modules/access-grants-instance"
   # source  = "tedilabs/s3/aws//modules/access-grants-instance"
   # version = "~> 0.1.0"
@@ -50,38 +47,38 @@ module "access_grants_instance" {
 # S3 Access Grants Location
 ###################################################
 
-## The default IAM role of the location is scoped down to the location scope,
-## and is the ceiling of all grants of the location.
-module "access_grants_location" {
+module "location" {
   source = "../../modules/access-grants-location"
   # source  = "tedilabs/s3/aws//modules/access-grants-location"
   # version = "~> 0.1.0"
 
-  name           = "example-marketing"
-  instance       = module.access_grants_instance.arn
-  location_scope = "s3://${module.bucket.name}/marketing/"
+  scope = "s3://${module.bucket.name}/marketing/"
 
   default_iam_role = {
-    permission = "READWRITE"
+    permission = "READ"
   }
 
   tags = {
     "project" = "terraform-aws-s3-examples"
   }
+
+  depends_on = [
+    module.instance,
+  ]
 }
 
 
 ###################################################
-# S3 Access Grant
+# IAM Role for the Grantee
 ###################################################
 
-## The grantee calls `s3:GetDataAccess` to get the temporary credentials which
-## are limited to the grant scope and the permission of this grant.
+## The grantee needs the `s3:GetDataAccess` permission of its own IAM policy to
+## request the temporary credentials of the granted S3 data.
 module "grantee_role" {
   source  = "tedilabs/account/aws//modules/iam-role"
-  version = "~> 0.33.0"
+  version = "~> 0.33.11"
 
-  name = "s3-access-grants-example-consumer"
+  name = "s3-access-grants-grant-example"
 
   trusted_iam_entity_policies = [
     {
@@ -105,17 +102,22 @@ data "aws_iam_policy_document" "grantee" {
       "s3:GetDataAccess",
       "s3:GetAccessGrantsInstanceForPrefix",
     ]
-    resources = [module.access_grants_instance.arn]
+    resources = [module.instance.arn]
   }
 }
 
-module "access_grant" {
-  source = "../../modules/access-grant"
-  # source  = "tedilabs/s3/aws//modules/access-grant"
+
+###################################################
+# S3 Access Grant
+###################################################
+
+module "grant" {
+  source = "../../modules/access-grants-grant"
+  # source  = "tedilabs/s3/aws//modules/access-grants-grant"
   # version = "~> 0.1.0"
 
-  name       = "example-marketing-read"
-  location   = module.access_grants_location.id
+  name       = "marketing-campaigns-read"
+  location   = module.location.id
   permission = "READ"
 
   grantee = {

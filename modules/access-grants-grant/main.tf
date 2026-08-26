@@ -14,6 +14,12 @@ locals {
   } : {}
 }
 
+data "aws_caller_identity" "this" {}
+
+locals {
+  account_id = data.aws_caller_identity.this.account_id
+}
+
 
 ###################################################
 # S3 Access Grant
@@ -27,10 +33,11 @@ locals {
 }
 
 # INFO: Not supported attributes
-# - `account_id`
 # - `application_arn`
 resource "aws_s3control_access_grant" "this" {
   region = var.region
+
+  account_id = local.account_id
 
   access_grants_location_id = var.location
   permission                = var.permission
