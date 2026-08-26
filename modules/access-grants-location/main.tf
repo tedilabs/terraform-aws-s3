@@ -14,25 +14,6 @@ locals {
   } : {}
 }
 
-data "aws_partition" "this" {}
-
-data "aws_caller_identity" "this" {}
-
-data "aws_region" "this" {
-  region = var.region
-}
-
-locals {
-  account_id = data.aws_caller_identity.this.account_id
-  partition  = data.aws_partition.this.partition
-  region     = data.aws_region.this.region
-
-  iam_role = (var.default_iam_role.enabled
-    ? one(module.default_iam_role[*].arn)
-    : var.iam_role
-  )
-}
-
 
 ###################################################
 # S3 Access Grants Location

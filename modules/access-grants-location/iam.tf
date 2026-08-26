@@ -1,35 +1,41 @@
-locals {
-  instance_arn = "arn:${local.partition}:s3:${local.region}:${local.account_id}:access-grants/default"
+data "aws_partition" "this" {}
 
-  scope       = trimprefix(var.scope, "s3://")
-  scope_parts = split("/", local.scope)
+data "aws_caller_identity" "this" {}
+
+data "aws_region" "this" {
+  region = var.region
+}
+
+locals {
+  account_id = data.aws_caller_identity.this.account_id
+  partition  = data.aws_partition.this.partition
+  region     = data.aws_region.this.region
+
+  iam_role = (var.default_iam_role.enabled
+    ? one(module.default_iam_role[*].arn)
+    : var.iam_role
+  )
+}
+
+locals {
+  instance_arn = provider::aws::arn_build(local.partition, "s3", local.region, local.account_id, "access-grants/default")
+
+  scope_parts = split("/", trimprefix(var.scope, "s3://"))
   bucket      = local.scope_parts[0]
   key_prefix  = trimsuffix(join("/", slice(local.scope_parts, 1, length(local.scope_parts))), "*")
 
   default_scope_enabled = local.bucket == ""
   bucket_arns = (local.default_scope_enabled
-    ? ["arn:${local.partition}:s3:::*"]
-    : ["arn:${local.partition}:s3:::${local.bucket}"]
+    ? [provider::aws::arn_build(local.partition, "s3", "", "", "*")]
+    : [provider::aws::arn_build(local.partition, "s3", "", "", local.bucket)]
   )
   object_arns = (local.default_scope_enabled
-    ? ["arn:${local.partition}:s3:::*"]
-    : ["arn:${local.partition}:s3:::${local.bucket}/${local.key_prefix}*"]
+    ? [provider::aws::arn_build(local.partition, "s3", "", "", "*")]
+    : [provider::aws::arn_build(local.partition, "s3", "", "", "${local.bucket}/${local.key_prefix}*")]
   )
 
   read_enabled  = contains(["READ", "READWRITE"], var.default_iam_role.permission)
   write_enabled = contains(["WRITE", "READWRITE"], var.default_iam_role.permission)
-
-  default_iam_role_name = coalesce(
-    var.default_iam_role.name,
-    join("-", [
-      "s3-access-grants",
-      (local.default_scope_enabled
-        ? "default"
-        : trimsuffix(replace(local.scope, "/[^a-zA-Z0-9_.-]/", "-"), "-")
-      ),
-      "location",
-    ]),
-  )
 }
 
 
@@ -53,15 +59,6 @@ data "aws_iam_policy_document" "access" {
       ]
       resources = local.bucket_arns
 
-      dynamic "condition" {
-        for_each = local.key_prefix != "" ? ["go"] : []
-
-        content {
-          test     = "StringLike"
-          variable = "s3:prefix"
-          values   = ["${local.key_prefix}*"]
-        }
-      }
       condition {
         test     = "StringEquals"
         variable = "aws:ResourceAccount"
@@ -133,7 +130,7 @@ data "aws_iam_policy_document" "access" {
   }
 
   dynamic "statement" {
-    for_each = length(var.default_iam_role.kms_keys) > 0 ? ["go"] : []
+    for_each = length(var.default_iam_role.sse_kms_keys) > 0 ? ["go"] : []
 
     content {
       sid    = "KMSPermissions"
@@ -142,7 +139,7 @@ data "aws_iam_policy_document" "access" {
         local.read_enabled ? ["kms:Decrypt"] : [],
         local.write_enabled ? ["kms:GenerateDataKey"] : [],
       )
-      resources = var.default_iam_role.kms_keys
+      resources = var.default_iam_role.sse_kms_keys
 
       condition {
         test     = "StringEquals"
@@ -159,7 +156,15 @@ module "default_iam_role" {
   source  = "tedilabs/account/aws//modules/iam-role"
   version = "~> 0.33.11"
 
-  name        = local.default_iam_role_name
+  name = coalesce(
+    var.default_iam_role.name,
+    join(".", [
+      "s3",
+      "access-grants",
+      "location",
+      md5(var.scope)
+    ]),
+  )
   path        = var.default_iam_role.path
   description = var.default_iam_role.description
 
@@ -174,8 +179,8 @@ module "default_iam_role" {
         },
         {
           key       = "aws:SourceArn"
-          condition = "ArnLike"
-          values    = ["arn:${local.partition}:s3:*:${local.account_id}:access-grants/default"]
+          condition = "ArnEquals"
+          values    = [local.instance_arn]
         },
       ]
     }

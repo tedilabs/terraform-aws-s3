@@ -32,7 +32,7 @@ variable "default_iam_role" {
     (Optional) `path` - The path of the default IAM role. Defaults to `/`.
     (Optional) `description` - The description of the default IAM role.
     (Optional) `permission` - The maximum level of access which the role allows within the location scope. Access grants for the location can only narrow this down. Valid values are `READ`, `WRITE` and `READWRITE`. Defaults to `READWRITE`.
-    (Optional) `kms_keys` - A set of ARNs of AWS KMS keys to allow the role to use for `SSE-KMS` encrypted objects within the location scope. Defaults to `[]`.
+    (Optional) `sse_kms_keys` - A set of ARNs of AWS KMS keys to allow the role to use for `SSE-KMS` encrypted objects within the location scope. Defaults to `[]`.
     (Optional) `policies` - A list of IAM policy ARNs to attach to the default IAM role. Defaults to `[]`.
     (Optional) `inline_policies` - A Map of inline IAM policies to attach to the default IAM role. (`name` => `policy`).
     (Optional) `permissions_boundary` - The ARN of the IAM policy to use as permissions boundary for the default IAM role.
@@ -43,8 +43,8 @@ variable "default_iam_role" {
     path        = optional(string, "/")
     description = optional(string, "Managed by Terraform.")
 
-    permission = optional(string, "READWRITE")
-    kms_keys   = optional(set(string), [])
+    permission   = optional(string, "READWRITE")
+    sse_kms_keys = optional(set(string), [])
 
     policies             = optional(list(string), [])
     inline_policies      = optional(map(string), {})
