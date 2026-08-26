@@ -4,6 +4,11 @@
   - any-glob-to-any-file:
     - modules/access-grants-instance/**/*
 
+":floppy_disk: access-grants-location":
+- changed-files:
+  - any-glob-to-any-file:
+    - modules/access-grants-location/**/*
+
 ":floppy_disk: access-point":
 - changed-files:
   - any-glob-to-any-file:
