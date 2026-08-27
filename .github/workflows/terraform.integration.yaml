@@ -66,12 +66,12 @@ jobs:
     name: Lint (terraform)
     needs:
     - changed
-    if: ${{ needs.changed.outputs.modified == 'true' }}
+    if: ${{ needs.changed.outputs.changed == 'true' }}
     uses: tedilabs/.github/.github/workflows/terraform.terraform.yaml@main
 
     strategy:
       matrix:
-        path: ${{ fromJson(needs.changed.outputs.modified_directories) }}
+        path: ${{ fromJson(needs.changed.outputs.changed_directories) }}
 
     with:
       terraform_target_dir: ${{ matrix.path }}
@@ -87,12 +87,12 @@ jobs:
     name: Lint (tflint)
     needs:
     - changed
-    if: ${{ needs.changed.outputs.modified == 'true' }}
+    if: ${{ needs.changed.outputs.changed == 'true' }}
     uses: tedilabs/.github/.github/workflows/terraform.tflint.yaml@main
 
     strategy:
       matrix:
-        path: ${{ fromJson(needs.changed.outputs.modified_directories) }}
+        path: ${{ fromJson(needs.changed.outputs.changed_directories) }}
 
     with:
       tflint_version: latest

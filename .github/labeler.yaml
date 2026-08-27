@@ -1,4 +1,9 @@
 # Modules
+":floppy_disk: access-grants-grant":
+- changed-files:
+  - any-glob-to-any-file:
+    - modules/access-grants-grant/**/*
+
 ":floppy_disk: access-grants-instance":
 - changed-files:
   - any-glob-to-any-file:
