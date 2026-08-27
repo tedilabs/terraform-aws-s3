@@ -68,18 +68,6 @@ module "location" {
 # IAM Role for Grantee
 ###################################################
 
-data "aws_iam_policy_document" "grantee_trust" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "AWS"
-      identifiers = [local.account_id]
-    }
-  }
-}
-
 data "aws_iam_policy_document" "grantee_access" {
   statement {
     effect    = "Allow"
@@ -88,19 +76,25 @@ data "aws_iam_policy_document" "grantee_access" {
   }
 }
 
-resource "aws_iam_role" "grantee" {
-  name               = "access-grants-example-grantee"
-  assume_role_policy = data.aws_iam_policy_document.grantee_trust.json
+module "grantee_role" {
+  source  = "tedilabs/account/aws//modules/iam-role"
+  version = "~> 0.33.0"
+
+  name = "access-grants-example-grantee"
+
+  trusted_iam_entity_policies = [
+    {
+      iam_entities = ["arn:aws:iam::${local.account_id}:root"]
+    }
+  ]
+
+  inline_policies = {
+    "s3-access-grants" = data.aws_iam_policy_document.grantee_access.json
+  }
 
   tags = {
     "project" = "terraform-aws-s3-examples"
   }
-}
-
-resource "aws_iam_role_policy" "grantee" {
-  role   = aws_iam_role.grantee.id
-  name   = "s3-access-grants"
-  policy = data.aws_iam_policy_document.grantee_access.json
 }
 
 
@@ -120,7 +114,7 @@ module "grant" {
   s3_sub_prefix = "analytics/*"
   grantee = {
     type       = "IAM"
-    identifier = aws_iam_role.grantee.arn
+    identifier = module.grantee_role.arn
   }
 
   tags = {
