@@ -18,9 +18,19 @@ output "arn" {
   value       = aws_s3control_access_grant.this.access_grant_arn
 }
 
-output "location_id" {
-  description = "The ID of the S3 Access Grants location to which the access grant is giving access."
-  value       = aws_s3control_access_grant.this.access_grants_location_id
+output "owner" {
+  description = "The AWS account ID of the owner of the S3 Access Grant."
+  value       = aws_s3control_access_grant.this.account_id
+}
+
+output "location" {
+  description = <<EOF
+  The S3 Access Grants location to which the access grant is giving access.
+     `id` - The ID of the S3 Access Grants location.
+  EOF
+  value = {
+    id = aws_s3control_access_grant.this.access_grants_location_id
+  }
 }
 
 output "grant_scope" {

@@ -28,11 +28,11 @@ locals {
 resource "aws_s3control_access_grant" "this" {
   region = var.region
 
-  account_id = local.account_id
+  account_id                = local.account_id
+  access_grants_location_id = var.location
 
-  access_grants_location_id = var.location_id
-  permission                = var.permission
-  s3_prefix_type            = var.object_grant_enabled ? "Object" : null
+  permission     = var.permission
+  s3_prefix_type = var.object_grant_enabled ? "Object" : null
 
   dynamic "access_grants_location_configuration" {
     for_each = var.s3_sub_prefix != null ? [var.s3_sub_prefix] : []

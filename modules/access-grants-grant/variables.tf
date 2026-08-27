@@ -11,7 +11,7 @@ variable "name" {
   nullable    = false
 }
 
-variable "location_id" {
+variable "location" {
   description = "(Required) The ID of the S3 Access Grants location to which the access grant is giving access. `default` is the ID of the location of the default S3 URI `s3://`."
   type        = string
   nullable    = false
