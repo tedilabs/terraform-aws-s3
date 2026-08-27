@@ -24,9 +24,9 @@ Terraform Modules from [this package](https://github.com/tedilabs/terraform-aws-
 - **AWS S3**
   - S3 Bucket
   - S3 Access Grants
-    - Access Grants Instance
-    - Access Grants Location
-    - Access Grants Grant
+    - Instance
+    - Location
+    - Grant
   - S3 Access Point
   - S3 Object
   - S3 Tables
