@@ -33,14 +33,18 @@ output "location" {
   }
 }
 
-output "grant_scope" {
-  description = "The S3 URI of the scope which the access grant gives access to."
-  value       = aws_s3control_access_grant.this.grant_scope
-}
-
 output "permission" {
   description = "The level of access given to the grantee within the grant scope."
   value       = aws_s3control_access_grant.this.permission
+}
+
+output "scope" {
+  description = "The scope of the S3 Access Grant."
+  value = {
+    type       = aws_s3control_access_grant.this.s3_prefix_type == local.prefix_type["OBJECT"] ? "OBJECT" : "PREFIX"
+    sub_prefix = one(aws_s3control_access_grant.this.access_grants_location_configuration[*].s3_sub_prefix)
+    path       = aws_s3control_access_grant.this.grant_scope
+  }
 }
 
 output "grantee" {

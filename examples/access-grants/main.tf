@@ -107,11 +107,14 @@ module "grant" {
   # source  = "tedilabs/s3/aws//modules/access-grants-grant"
   # version = "~> 0.1.0"
 
-  name        = "example-analytics-read"
-  location_id = module.location.id
+  name     = "example-analytics-read"
+  location = module.location.id
 
-  permission    = "READ"
-  s3_sub_prefix = "analytics/*"
+  permission = "READ"
+  scope = {
+    type       = "PREFIX"
+    sub_prefix = "analytics/*"
+  }
   grantee = {
     type       = "IAM"
     identifier = module.grantee_role.arn

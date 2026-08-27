@@ -18,6 +18,11 @@ data "aws_caller_identity" "this" {}
 
 locals {
   account_id = data.aws_caller_identity.this.account_id
+
+  prefix_type = {
+    "PREFIX" = null
+    "OBJECT" = "Object"
+  }
 }
 
 
@@ -32,10 +37,10 @@ resource "aws_s3control_access_grant" "this" {
   access_grants_location_id = var.location
 
   permission     = var.permission
-  s3_prefix_type = var.object_grant_enabled ? "Object" : null
+  s3_prefix_type = local.prefix_type[var.scope.type]
 
   dynamic "access_grants_location_configuration" {
-    for_each = var.s3_sub_prefix != null ? [var.s3_sub_prefix] : []
+    for_each = var.scope.sub_prefix != null ? [var.scope.sub_prefix] : []
 
     content {
       s3_sub_prefix = access_grants_location_configuration.value

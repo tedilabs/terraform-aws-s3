@@ -17,20 +17,6 @@ variable "location" {
   nullable    = false
 }
 
-variable "s3_sub_prefix" {
-  description = "(Optional) The sub-prefix appended to the scope of the registered location to narrow the scope of the access grant. Required if `location_id` is `default` (the location of the default S3 URI `s3://`). For example, if the location scope is `s3://bucket/prefix`, provide `prefix2/*` to create a grant scope of `s3://bucket/prefix/prefix2/*`."
-  type        = string
-  default     = null
-  nullable    = true
-}
-
-variable "object_grant_enabled" {
-  description = "(Optional) Whether the access grant gives access to only one object. Enable this to set `s3_prefix_type` of the access grant to `Object`. Defaults to `false`."
-  type        = bool
-  default     = false
-  nullable    = false
-}
-
 variable "permission" {
   description = "(Required) The level of access to be given to the grantee within the grant scope. Valid values are `READ`, `WRITE` and `READWRITE`."
   type        = string
@@ -39,6 +25,29 @@ variable "permission" {
   validation {
     condition     = contains(["READ", "WRITE", "READWRITE"], var.permission)
     error_message = "Valid values for `permission` are `READ`, `WRITE`, `READWRITE`."
+  }
+}
+
+variable "scope" {
+  description = <<EOF
+  (Optional) A configurations of the scope of the S3 Access Grant. The grant scope is the result of appending `scope.sub_prefix` to the location scope of the registered location. `scope` as defined below.
+    (Optional) `type` - The type of the grant scope. Valid values are `PREFIX` and `OBJECT`. Use `OBJECT` to grant access to a single S3 object. Defaults to `PREFIX`.
+    (Optional) `sub_prefix` - The S3 sub prefix which is appended to the location scope to narrow the grant scope to a subset of the location scope. Append the wildcard character `*` after the prefix to include all object key names which start with the prefix. (e.g. `marketing/*` of the `s3://amzn-s3-demo-bucket/` location makes the grant scope `s3://amzn-s3-demo-bucket/marketing/*`) Required if the location scope is the default location `s3://` because you cannot create a grant for all of your S3 data in the region.
+  EOF
+  type = object({
+    type       = optional(string, "PREFIX")
+    sub_prefix = optional(string)
+  })
+  default  = {}
+  nullable = false
+
+  validation {
+    condition     = contains(["PREFIX", "OBJECT"], var.scope.type)
+    error_message = "Valid values for `scope.type` are `PREFIX`, `OBJECT`."
+  }
+  validation {
+    condition     = var.scope.type != "OBJECT" || var.scope.sub_prefix != null
+    error_message = "`scope.sub_prefix` is required if the value of `scope.type` is `OBJECT`."
   }
 }
 
