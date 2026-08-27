@@ -36,7 +36,8 @@ resource "aws_s3control_access_grant" "this" {
   account_id                = local.account_id
   access_grants_location_id = var.location
 
-  permission     = var.permission
+
+  ## Scope
   s3_prefix_type = local.prefix_type[var.scope.type]
 
   dynamic "access_grants_location_configuration" {
@@ -47,10 +48,17 @@ resource "aws_s3control_access_grant" "this" {
     }
   }
 
+
+  ## Permission
+  permission = var.permission
+
+
+  ## Who
   grantee {
     grantee_type       = var.grantee.type
     grantee_identifier = var.grantee.id
   }
+
 
   tags = merge(
     {

@@ -33,11 +33,6 @@ output "location" {
   }
 }
 
-output "permission" {
-  description = "The level of access given to the grantee within the grant scope."
-  value       = aws_s3control_access_grant.this.permission
-}
-
 output "scope" {
   description = "The scope of the S3 Access Grant."
   value = {
@@ -45,6 +40,11 @@ output "scope" {
     sub_prefix = one(aws_s3control_access_grant.this.access_grants_location_configuration[*].s3_sub_prefix)
     path       = aws_s3control_access_grant.this.grant_scope
   }
+}
+
+output "permission" {
+  description = "The level of access given to the grantee within the grant scope."
+  value       = aws_s3control_access_grant.this.permission
 }
 
 output "grantee" {

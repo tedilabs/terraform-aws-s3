@@ -110,11 +110,11 @@ module "grant" {
   name     = "example-analytics-read"
   location = module.location.id
 
-  permission = "READ"
   scope = {
     type       = "PREFIX"
     sub_prefix = "analytics/*"
   }
+  permission = "READ"
   grantee = {
     type = "IAM"
     id   = module.grantee_role.arn
