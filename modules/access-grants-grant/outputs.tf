@@ -50,8 +50,8 @@ output "scope" {
 output "grantee" {
   description = "The grantee to which the access is given."
   value = {
-    type       = aws_s3control_access_grant.this.grantee[0].grantee_type
-    identifier = aws_s3control_access_grant.this.grantee[0].grantee_identifier
+    type = aws_s3control_access_grant.this.grantee[0].grantee_type
+    id   = aws_s3control_access_grant.this.grantee[0].grantee_identifier
   }
 }
 

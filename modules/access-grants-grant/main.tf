@@ -49,7 +49,7 @@ resource "aws_s3control_access_grant" "this" {
 
   grantee {
     grantee_type       = var.grantee.type
-    grantee_identifier = var.grantee.identifier
+    grantee_identifier = var.grantee.id
   }
 
   tags = merge(

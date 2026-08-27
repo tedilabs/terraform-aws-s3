@@ -58,11 +58,11 @@ variable "grantee" {
     - `IAM` - An IAM user or role ARN of the same or a different AWS account.
     - `DIRECTORY_USER` - A user GUID of the associated AWS IAM Identity Center instance.
     - `DIRECTORY_GROUP` - A group GUID of the associated AWS IAM Identity Center instance.
-    (Required) `identifier` - The identifier of the grantee. An IAM user or role ARN if `type` is `IAM`, a user or group GUID if `type` is `DIRECTORY_USER` or `DIRECTORY_GROUP`.
+    (Required) `id` - The identifier of the grantee. An IAM user or role ARN if `type` is `IAM`, a user or group GUID if `type` is `DIRECTORY_USER` or `DIRECTORY_GROUP`.
   EOF
   type = object({
-    type       = string
-    identifier = string
+    type = string
+    id   = string
   })
   nullable = false
 

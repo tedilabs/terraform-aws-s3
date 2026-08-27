@@ -116,8 +116,8 @@ module "grant" {
     sub_prefix = "analytics/*"
   }
   grantee = {
-    type       = "IAM"
-    identifier = module.grantee_role.arn
+    type = "IAM"
+    id   = module.grantee_role.arn
   }
 
   tags = {
