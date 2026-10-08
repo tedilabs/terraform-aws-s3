@@ -54,7 +54,7 @@ module "replication_service_role" {
 
   name = coalesce(
     var.replication.default_service_role.name,
-    "s3tables-${local.table_bucket_name}-${local.metadata.name}-replication",
+    "s3tables-${local.table_bucket_name}-${var.name}-replication",
   )
   path        = var.replication.default_service_role.path
   description = var.replication.default_service_role.description
