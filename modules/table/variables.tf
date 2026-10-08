@@ -146,7 +146,7 @@ variable "replication" {
     (Optional) `service_role` - The ARN (Amazon Resource Name) of the IAM Role that Amazon S3 assumes when replicating the table. Only required if `replication.default_service_role.enabled` is `false`.
     (Optional) `default_service_role` - A configuration for the default service role for the table replication. Use `replication.service_role` if `replication.default_service_role.enabled` is `false`. Add KMS permissions with `policies` or `inline_policies` if the table is encrypted with KMS. `default_service_role` as defined below.
       (Optional) `enabled` - Whether to create the default service role. Defaults to `true`.
-      (Optional) `name` - The name of the default service role. Defaults to `s3tables-$${bucket-name}-$${var.name}-replication`.
+      (Optional) `name` - The name of the default service role. Defaults to `s3tables-$${bucket-name}-$${var.namespace}-$${var.name}-replication`.
       (Optional) `path` - The path of the default service role. Defaults to `/`.
       (Optional) `description` - The description of the default service role.
       (Optional) `policies` - A list of IAM policy ARNs to attach to the default service role. Defaults to `[]`.
