@@ -33,4 +33,8 @@ module "objects" {
     local.module_tags,
     var.tags,
   )
+
+  telemetry = {
+    enabled = false
+  }
 }

@@ -154,7 +154,7 @@ module "default_iam_role" {
   count = var.default_iam_role.enabled ? 1 : 0
 
   source  = "tedilabs/account/aws//modules/iam-role"
-  version = "~> 0.33.11"
+  version = "~> 0.34.0"
 
   name = coalesce(
     var.default_iam_role.name,
@@ -206,4 +206,8 @@ module "default_iam_role" {
     local.module_tags,
     var.tags,
   )
+
+  telemetry = {
+    enabled = false
+  }
 }

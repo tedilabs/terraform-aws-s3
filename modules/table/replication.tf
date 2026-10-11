@@ -50,7 +50,7 @@ module "replication_service_role" {
   count = (local.replication_enabled && var.replication.default_service_role.enabled) ? 1 : 0
 
   source  = "tedilabs/account/aws//modules/iam-role"
-  version = "~> 0.33.0"
+  version = "~> 0.34.0"
 
   name = coalesce(
     var.replication.default_service_role.name,
@@ -126,4 +126,8 @@ module "replication_service_role" {
     local.module_tags,
     var.tags,
   )
+
+  telemetry = {
+    enabled = false
+  }
 }
