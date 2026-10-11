@@ -31,8 +31,8 @@ This module creates following resources.
 
 | Name | Source | Version |
 | ---- | ------ | ------- |
-| <a name="module_default_iam_role"></a> [default\_iam\_role](#module\_default\_iam\_role) | tedilabs/account/aws//modules/iam-role | ~> 0.33.11 |
-| <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | tedilabs/misc/aws//modules/resource-group | ~> 0.12.0 |
+| <a name="module_default_iam_role"></a> [default\_iam\_role](#module\_default\_iam\_role) | tedilabs/account/aws//modules/iam-role | ~> 0.34.0 |
+| <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | tedilabs/misc/aws//modules/resource-group | ~> 0.13.0 |
 
 ## Resources
 
