@@ -1,7 +1,9 @@
 output "table_bucket" {
-  value = module.table_bucket
+  description = "The outputs of the S3 table bucket module."
+  value       = module.table_bucket
 }
 
 output "table" {
-  value = module.table
+  description = "The outputs of the S3 table module."
+  value       = module.table
 }
