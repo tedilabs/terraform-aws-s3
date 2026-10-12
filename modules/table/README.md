@@ -69,7 +69,6 @@ This module creates following resources.
 | <a name="output_arn"></a> [arn](#output\_arn) | The ARN of the table. |
 | <a name="output_created_at"></a> [created\_at](#output\_created\_at) | Date and time when the table was created. |
 | <a name="output_created_by"></a> [created\_by](#output\_created\_by) | The account ID of the account that created the table. |
-| <a name="output_debug"></a> [debug](#output\_debug) | Additional table, policy, and replication resource attributes for debugging. |
 | <a name="output_encryption"></a> [encryption](#output\_encryption) | The configuration for the Server-Side Encryption of the table. `override` indicates whether the table overrides the encryption configuration of the table bucket. |
 | <a name="output_format"></a> [format](#output\_format) | The format of the table. |
 | <a name="output_maintenance"></a> [maintenance](#output\_maintenance) | The maintenance configuration of the table. |
