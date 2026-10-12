@@ -61,6 +61,8 @@ module "replication_service_role" {
     }
   ]
 
+  assumable_roles = var.replication.default_service_role.assumable_roles
+
   policies = var.replication.default_service_role.policies
   inline_policies = merge({
     "s3tables-replication" = jsonencode({
