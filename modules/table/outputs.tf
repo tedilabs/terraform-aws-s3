@@ -161,28 +161,28 @@ output "resource_group" {
   )
 }
 
-output "debug" {
-  value = {
-    table = {
-      for k, v in aws_s3tables_table.this :
-      k => v
-      if !contains(["tags", "tags_all", "region", "arn", "created_at", "encryption_configuration", "name", "namespace", "owner_account_id", "table_bucket_arn", "version_token", "format", "metadata_location", "warehouse_location", "modified_at", "type", "created_by", "modified_by", "maintenance_configuration"], k)
-    }
-    policy = (length(aws_s3tables_table_policy.this) > 0
-      ? {
-        for k, v in aws_s3tables_table_policy.this[0] :
-        k => v
-        if !contains(["table_bucket_arn", "resource_policy", "region", "name", "namespace"], k)
-      }
-      : null
-    )
-    replication = (local.replication_enabled
-      ? {
-        for k, v in aws_s3tables_table_replication.this[0] :
-        k => v
-        if !contains(["region", "role", "table_arn", "rule"], k)
-      }
-      : null
-    )
-  }
-}
+# output "debug" {
+#   value = {
+#     table = {
+#       for k, v in aws_s3tables_table.this :
+#       k => v
+#       if !contains(["tags", "tags_all", "region", "arn", "created_at", "encryption_configuration", "name", "namespace", "owner_account_id", "table_bucket_arn", "version_token", "format", "metadata_location", "warehouse_location", "modified_at", "type", "created_by", "modified_by", "maintenance_configuration"], k)
+#     }
+#     policy = (length(aws_s3tables_table_policy.this) > 0
+#       ? {
+#         for k, v in aws_s3tables_table_policy.this[0] :
+#         k => v
+#         if !contains(["table_bucket_arn", "resource_policy", "region", "name", "namespace"], k)
+#       }
+#       : null
+#     )
+#     replication = (local.replication_enabled
+#       ? {
+#         for k, v in aws_s3tables_table_replication.this[0] :
+#         k => v
+#         if !contains(["region", "role", "table_arn", "rule"], k)
+#       }
+#       : null
+#     )
+#   }
+# }
