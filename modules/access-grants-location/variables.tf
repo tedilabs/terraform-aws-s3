@@ -33,6 +33,7 @@ variable "default_iam_role" {
     (Optional) `description` - The description of the default IAM role.
     (Optional) `permission` - The maximum level of access which the role allows within the location scope. Access grants for the location can only narrow this down. Valid values are `READ`, `WRITE` and `READWRITE`. Defaults to `READWRITE`.
     (Optional) `sse_kms_keys` - A set of ARNs of AWS KMS keys to allow the role to use for `SSE-KMS` encrypted objects within the location scope. Defaults to `[]`.
+    (Optional) `assumable_roles` - A set of IAM role ARNs that can be assumed by this role. Defaults to `[]`.
     (Optional) `policies` - A list of IAM policy ARNs to attach to the default IAM role. Defaults to `[]`.
     (Optional) `inline_policies` - A Map of inline IAM policies to attach to the default IAM role. (`name` => `policy`).
     (Optional) `permissions_boundary` - The ARN of the IAM policy to use as permissions boundary for the default IAM role.
@@ -46,6 +47,7 @@ variable "default_iam_role" {
     permission   = optional(string, "READWRITE")
     sse_kms_keys = optional(set(string), [])
 
+    assumable_roles      = optional(set(string), [])
     policies             = optional(list(string), [])
     inline_policies      = optional(map(string), {})
     permissions_boundary = optional(string)

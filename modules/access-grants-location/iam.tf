@@ -189,6 +189,8 @@ module "default_iam_role" {
     enabled = true
   }
 
+  assumable_roles = var.default_iam_role.assumable_roles
+
   policies = var.default_iam_role.policies
   inline_policies = merge({
     "s3-access-grants-location" = data.aws_iam_policy_document.access[0].json

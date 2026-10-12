@@ -29,6 +29,8 @@ module "replication_iam_role" {
     }
   ]
 
+  assumable_roles = var.default_replication_iam_role.assumable_roles
+
   policies = var.default_replication_iam_role.policies
   inline_policies = merge({
     "s3-replication" = jsonencode(yamldecode(<<EOF
