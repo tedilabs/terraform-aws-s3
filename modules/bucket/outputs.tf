@@ -90,6 +90,19 @@ output "versioning" {
   }
 }
 
+output "intelligent_tiering_configurations" {
+  description = "The Intelligent-Tiering configurations by name."
+  value = {
+    for name, configuration in aws_s3_bucket_intelligent_tiering_configuration.this :
+    name => {
+      id       = configuration.id
+      enabled  = configuration.status == "Enabled"
+      filter   = one(configuration.filter[*])
+      tierings = configuration.tiering
+    }
+  }
+}
+
 output "lifecycle" {
   description = "The lifecycle configuration for the bucket."
   value = {
