@@ -2,7 +2,6 @@
 # Request Metrics for S3 Bucket
 ###################################################
 
-# TODO: Support access point filter
 resource "aws_s3_bucket_metric" "this" {
   for_each = {
     for metric in var.request_metrics :
