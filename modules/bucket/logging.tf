@@ -11,7 +11,6 @@ locals {
 ###################################################
 
 # INFO: Not supported attributes
-# - `expected_bucket_owner`
 # - `target_grant` (Using ACL is not recommended)
 resource "aws_s3_bucket_logging" "this" {
   count = var.logging.enabled ? 1 : 0
