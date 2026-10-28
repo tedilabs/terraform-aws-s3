@@ -71,7 +71,6 @@ resource "aws_s3_bucket_ownership_controls" "this" {
 ###################################################
 
 # INFO: Not supported attributes
-# - `expected_bucket_owner`
 # - `acl`
 # - `access_control_policy.owner.display_name`
 resource "aws_s3_bucket_acl" "this" {
@@ -138,8 +137,6 @@ resource "aws_s3_bucket_public_access_block" "this" {
 # CORS (Cross-Origin Resource Sharing) for S3 Bucket
 ###################################################
 
-# INFO: Not supported attributes
-# - `expected_bucket_owner`
 resource "aws_s3_bucket_cors_configuration" "this" {
   count = length(var.cors_rules) > 0 ? 1 : 0
 

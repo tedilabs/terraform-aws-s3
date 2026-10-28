@@ -68,8 +68,6 @@ locals {
   }
 }
 
-# INFO: Not supported attributes
-# - `expected_bucket_owner`
 resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
   region = var.region
 

@@ -16,8 +16,6 @@ locals {
 # Versioning for S3 Bucket
 ###################################################
 
-# INFO: Not supported attributes
-# - `expected_bucket_owner`
 resource "aws_s3_bucket_versioning" "this" {
   region = var.region
 
@@ -42,8 +40,6 @@ resource "aws_s3_bucket_versioning" "this" {
 # Object Lock for S3 Bucket
 ###################################################
 
-# INFO: Not supported attributes
-# - `expected_bucket_owner`
 # INFO: Deprecated attributes
 # - `token`
 resource "aws_s3_bucket_object_lock_configuration" "this" {
@@ -78,8 +74,6 @@ resource "aws_s3_bucket_object_lock_configuration" "this" {
 # Lifecycle Rules for S3 Bucket
 ###################################################
 
-# INFO: Not supported attributes
-# - `expected_bucket_owner`
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
   count = length(var.lifecycle_rules) > 0 ? 1 : 0
 
