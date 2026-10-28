@@ -279,6 +279,67 @@ variable "objects" {
   }
 }
 
+variable "intelligent_tiering_rules" {
+  description = <<EOF
+  (Optional) A configurations of Intelligent-Tiering rules for the S3 bucket. These configure optional archive access tiers for objects already in the `INTELLIGENT_TIERING` storage class; use lifecycle rules to transition objects into that storage class. Each value of `intelligent_tiering_rules` as defined below.
+    (Required) `name` - Unique name of the configuration within the bucket.
+    (Optional) `enabled` - Whether the configuration is enabled. Defaults to `true`.
+    (Optional) `filter` - Restrict the configuration to objects matching a prefix and all specified tags. If omitted, the configuration applies to the entire bucket. `filter` block as defined below.
+      (Optional) `prefix` - Object key name prefix that identifies the subset of objects to which the configuration applies.
+      (Optional) `tags` - A map of object tags to match.
+    (Required) `tierings` - A list of archive access tiers. Specify each access tier at most once, with at least one tier. `tierings` block as defined below.
+      (Required) `access_tier` - S3 Intelligent-Tiering access tier. Valid values are `ARCHIVE_ACCESS` and `DEEP_ARCHIVE_ACCESS`.
+      (Required) `days` - Number of consecutive days of no access after which an object will be eligible to be transitioned to the corresponding tier. Must be an integer between 90 and 730 for `ARCHIVE_ACCESS`, or between 180 and 730 for `DEEP_ARCHIVE_ACCESS`.
+  EOF
+  type = list(object({
+    name    = string
+    enabled = optional(bool, true)
+    filter = optional(object({
+      prefix = optional(string)
+      tags   = optional(map(string), {})
+    }))
+    tierings = list(object({
+      access_tier = string
+      days        = number
+    }))
+  }))
+  default  = []
+  nullable = false
+
+  validation {
+    condition = alltrue([
+      for rule in var.intelligent_tiering_rules :
+      trimspace(rule.name) != ""
+    ]) && length(distinct(var.intelligent_tiering_rules[*].name)) == length(var.intelligent_tiering_rules)
+    error_message = "Intelligent-Tiering configuration names must be non-empty and unique."
+  }
+  validation {
+    condition = alltrue([
+      for rule in var.intelligent_tiering_rules :
+      length(rule.tierings) > 0 && length(distinct(rule.tierings[*].access_tier)) == length(rule.tierings)
+    ])
+    error_message = "Each Intelligent-Tiering configuration must contain at least one tier and must not repeat an access tier."
+  }
+  validation {
+    condition = alltrue(flatten([
+      for rule in var.intelligent_tiering_rules : [
+        for tiering in rule.tierings :
+        contains(["ARCHIVE_ACCESS", "DEEP_ARCHIVE_ACCESS"], tiering.access_tier)
+      ]
+    ]))
+    error_message = "Valid values for `access_tier` are `ARCHIVE_ACCESS` and `DEEP_ARCHIVE_ACCESS`."
+  }
+  validation {
+    condition = alltrue(flatten([
+      for rule in var.intelligent_tiering_rules : [
+        for tiering in rule.tierings :
+        tiering.days == floor(tiering.days) && tiering.days <= 730 && tiering.days >= (tiering.access_tier == "DEEP_ARCHIVE_ACCESS" ? 180 : 90)
+      ]
+    ]))
+    error_message = "Tiering days must be integers between 90 and 730 for ARCHIVE_ACCESS, or between 180 and 730 for DEEP_ARCHIVE_ACCESS."
+  }
+}
+
 variable "lifecycle_transition_default_min_object_size_strategy" {
   description = "(Optional) The default minimum object size (in bytes) to which the lifecycle transition rule applies. This is used when a lifecycle rule does not specify `min_object_size`. Valid values are `all_storage_classes_128K` and `varies_by_storage_class`. Custom filters always take precedence over the default transition behavior. Defaults to `all_storage_classes_128K`."
   type        = string
