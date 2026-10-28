@@ -93,12 +93,13 @@ output "versioning" {
 output "intelligent_tiering_rules" {
   description = "The Intelligent-Tiering rules by name."
   value = {
-    for name, configuration in aws_s3_bucket_intelligent_tiering_configuration.this :
+    for name, rule in aws_s3_bucket_intelligent_tiering_configuration.this :
     name => {
-      id       = configuration.id
-      enabled  = configuration.status == "Enabled"
-      filter   = one(configuration.filter[*])
-      tierings = configuration.tiering
+      id       = rule.id
+      name     = rule.name
+      enabled  = rule.status == "Enabled"
+      filter   = one(rule.filter[*])
+      tierings = rule.tiering
     }
   }
 }
