@@ -90,8 +90,8 @@ output "versioning" {
   }
 }
 
-output "intelligent_tiering_configurations" {
-  description = "The Intelligent-Tiering configurations by name."
+output "intelligent_tiering_rules" {
+  description = "The Intelligent-Tiering rules by name."
   value = {
     for name, configuration in aws_s3_bucket_intelligent_tiering_configuration.this :
     name => {

@@ -26,7 +26,7 @@ run "defaults" {
   command = plan
 
   assert {
-    condition     = length(aws_s3_bucket_intelligent_tiering_configuration.this) == 0 && length(output.intelligent_tiering_configurations) == 0
+    condition     = length(aws_s3_bucket_intelligent_tiering_configuration.this) == 0 && length(output.intelligent_tiering_rules) == 0
     error_message = "Existing callers must not create Intelligent-Tiering configurations."
   }
 }
@@ -35,7 +35,7 @@ run "configurations" {
   command = plan
 
   variables {
-    intelligent_tiering_configurations = [
+    intelligent_tiering_rules = [
       {
         name = "entire-bucket"
         tierings = [
@@ -78,12 +78,12 @@ run "configurations" {
   }
   assert {
     condition = (
-      !output.intelligent_tiering_configurations["filtered"].enabled &&
-      output.intelligent_tiering_configurations["filtered"].filter.prefix == "documents/" &&
-      output.intelligent_tiering_configurations["filtered"].filter.tags["classification"] == "archive" &&
-      one(output.intelligent_tiering_configurations["filtered"].tierings).days == 180 &&
-      output.intelligent_tiering_configurations["tags-only"].filter.tags["archive"] == "true" &&
-      output.intelligent_tiering_configurations["prefix-only"].filter.prefix == "logs/"
+      !output.intelligent_tiering_rules["filtered"].enabled &&
+      output.intelligent_tiering_rules["filtered"].filter.prefix == "documents/" &&
+      output.intelligent_tiering_rules["filtered"].filter.tags["classification"] == "archive" &&
+      one(output.intelligent_tiering_rules["filtered"].tierings).days == 180 &&
+      output.intelligent_tiering_rules["tags-only"].filter.tags["archive"] == "true" &&
+      output.intelligent_tiering_rules["prefix-only"].filter.prefix == "logs/"
     )
     error_message = "Disabled status, tier days, and prefix/tag filters must be preserved."
   }
@@ -93,88 +93,88 @@ run "reject_empty_tiers" {
   command = plan
 
   variables {
-    intelligent_tiering_configurations = [{ name = "invalid", tierings = [] }]
+    intelligent_tiering_rules = [{ name = "invalid", tierings = [] }]
   }
 
-  expect_failures = [var.intelligent_tiering_configurations]
+  expect_failures = [var.intelligent_tiering_rules]
 }
 
 run "reject_duplicate_tiers" {
   command = plan
 
   variables {
-    intelligent_tiering_configurations = [{ name = "invalid", tierings = [{ access_tier = "ARCHIVE_ACCESS", days = 90 }, { access_tier = "ARCHIVE_ACCESS", days = 100 }] }]
+    intelligent_tiering_rules = [{ name = "invalid", tierings = [{ access_tier = "ARCHIVE_ACCESS", days = 90 }, { access_tier = "ARCHIVE_ACCESS", days = 100 }] }]
   }
 
-  expect_failures = [var.intelligent_tiering_configurations]
+  expect_failures = [var.intelligent_tiering_rules]
 }
 
 run "reject_unsupported_tier" {
   command = plan
 
   variables {
-    intelligent_tiering_configurations = [{ name = "invalid", tierings = [{ access_tier = "STANDARD", days = 90 }] }]
+    intelligent_tiering_rules = [{ name = "invalid", tierings = [{ access_tier = "STANDARD", days = 90 }] }]
   }
 
-  expect_failures = [var.intelligent_tiering_configurations]
+  expect_failures = [var.intelligent_tiering_rules]
 }
 
 run "reject_archive_too_early" {
   command = plan
 
   variables {
-    intelligent_tiering_configurations = [{ name = "invalid", tierings = [{ access_tier = "ARCHIVE_ACCESS", days = 89 }] }]
+    intelligent_tiering_rules = [{ name = "invalid", tierings = [{ access_tier = "ARCHIVE_ACCESS", days = 89 }] }]
   }
 
-  expect_failures = [var.intelligent_tiering_configurations]
+  expect_failures = [var.intelligent_tiering_rules]
 }
 
 run "reject_deep_archive_too_early" {
   command = plan
 
   variables {
-    intelligent_tiering_configurations = [{ name = "invalid", tierings = [{ access_tier = "DEEP_ARCHIVE_ACCESS", days = 179 }] }]
+    intelligent_tiering_rules = [{ name = "invalid", tierings = [{ access_tier = "DEEP_ARCHIVE_ACCESS", days = 179 }] }]
   }
 
-  expect_failures = [var.intelligent_tiering_configurations]
+  expect_failures = [var.intelligent_tiering_rules]
 }
 
 run "reject_too_late" {
   command = plan
 
   variables {
-    intelligent_tiering_configurations = [{ name = "invalid", tierings = [{ access_tier = "ARCHIVE_ACCESS", days = 731 }] }]
+    intelligent_tiering_rules = [{ name = "invalid", tierings = [{ access_tier = "ARCHIVE_ACCESS", days = 731 }] }]
   }
 
-  expect_failures = [var.intelligent_tiering_configurations]
+  expect_failures = [var.intelligent_tiering_rules]
 }
 
 run "reject_fractional_days" {
   command = plan
 
   variables {
-    intelligent_tiering_configurations = [{ name = "invalid", tierings = [{ access_tier = "ARCHIVE_ACCESS", days = 90.5 }] }]
+    intelligent_tiering_rules = [{ name = "invalid", tierings = [{ access_tier = "ARCHIVE_ACCESS", days = 90.5 }] }]
   }
 
-  expect_failures = [var.intelligent_tiering_configurations]
+  expect_failures = [var.intelligent_tiering_rules]
 }
 
 run "reject_duplicate_names" {
   command = plan
 
   variables {
-    intelligent_tiering_configurations = [{ name = "duplicate", tierings = [{ access_tier = "ARCHIVE_ACCESS", days = 90 }] }, { name = "duplicate", tierings = [{ access_tier = "DEEP_ARCHIVE_ACCESS", days = 180 }] }]
+    intelligent_tiering_rules = [{ name = "duplicate", tierings = [{ access_tier = "ARCHIVE_ACCESS", days = 90 }] }, { name = "duplicate", tierings = [{ access_tier = "DEEP_ARCHIVE_ACCESS", days = 180 }] }]
   }
 
-  expect_failures = [var.intelligent_tiering_configurations]
+  expect_failures = [var.intelligent_tiering_rules]
 }
 
 run "reject_empty_name" {
   command = plan
 
   variables {
-    intelligent_tiering_configurations = [{ name = " ", tierings = [{ access_tier = "ARCHIVE_ACCESS", days = 90 }] }]
+    intelligent_tiering_rules = [{ name = " ", tierings = [{ access_tier = "ARCHIVE_ACCESS", days = 90 }] }]
   }
 
-  expect_failures = [var.intelligent_tiering_configurations]
+  expect_failures = [var.intelligent_tiering_rules]
 }

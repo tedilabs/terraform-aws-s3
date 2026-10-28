@@ -23,7 +23,7 @@ module "bucket" {
     },
   ]
 
-  intelligent_tiering_configurations = [
+  intelligent_tiering_rules = [
     {
       name = "entire-bucket"
       tierings = [

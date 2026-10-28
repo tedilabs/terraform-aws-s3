@@ -4,7 +4,7 @@
 
 resource "aws_s3_bucket_intelligent_tiering_configuration" "this" {
   for_each = {
-    for configuration in var.intelligent_tiering_configurations :
+    for configuration in var.intelligent_tiering_rules :
     configuration.name => configuration
   }
 

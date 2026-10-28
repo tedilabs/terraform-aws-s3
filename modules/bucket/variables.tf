@@ -279,9 +279,9 @@ variable "objects" {
   }
 }
 
-variable "intelligent_tiering_configurations" {
+variable "intelligent_tiering_rules" {
   description = <<EOF
-  (Optional) A list of Intelligent-Tiering configurations. These configure optional archive access tiers for objects already in the INTELLIGENT_TIERING storage class; use lifecycle rules to transition objects into that storage class.
+  (Optional) A list of Intelligent-Tiering rules. These configure optional archive access tiers for objects already in the INTELLIGENT_TIERING storage class; use lifecycle rules to transition objects into that storage class.
     (Required) `name` - Unique name of the configuration within the bucket.
     (Optional) `enabled` - Whether the configuration is enabled. Defaults to `true`.
     (Optional) `filter` - Restrict the configuration to objects matching a prefix and all specified tags. If omitted, the configuration applies to the entire bucket.
@@ -308,21 +308,21 @@ variable "intelligent_tiering_configurations" {
 
   validation {
     condition = alltrue([
-      for configuration in var.intelligent_tiering_configurations :
+      for configuration in var.intelligent_tiering_rules :
       trimspace(configuration.name) != ""
-    ]) && length(distinct(var.intelligent_tiering_configurations[*].name)) == length(var.intelligent_tiering_configurations)
+    ]) && length(distinct(var.intelligent_tiering_rules[*].name)) == length(var.intelligent_tiering_rules)
     error_message = "Intelligent-Tiering configuration names must be non-empty and unique."
   }
   validation {
     condition = alltrue([
-      for configuration in var.intelligent_tiering_configurations :
+      for configuration in var.intelligent_tiering_rules :
       length(configuration.tierings) > 0 && length(distinct(configuration.tierings[*].access_tier)) == length(configuration.tierings)
     ])
     error_message = "Each Intelligent-Tiering configuration must contain at least one tier and must not repeat an access tier."
   }
   validation {
     condition = alltrue(flatten([
-      for configuration in var.intelligent_tiering_configurations : [
+      for configuration in var.intelligent_tiering_rules : [
         for tiering in configuration.tierings :
         contains(["ARCHIVE_ACCESS", "DEEP_ARCHIVE_ACCESS"], tiering.access_tier)
       ]
@@ -331,7 +331,7 @@ variable "intelligent_tiering_configurations" {
   }
   validation {
     condition = alltrue(flatten([
-      for configuration in var.intelligent_tiering_configurations : [
+      for configuration in var.intelligent_tiering_rules : [
         for tiering in configuration.tierings :
         tiering.days == floor(tiering.days) && tiering.days <= 730 && tiering.days >= (tiering.access_tier == "DEEP_ARCHIVE_ACCESS" ? 180 : 90)
       ]
