@@ -682,6 +682,53 @@ variable "logging" {
   }
 }
 
+variable "analytics_configurations" {
+  description = <<EOF
+  (Optional) A list of S3 Storage Class Analysis configurations.
+    (Required) `name` - Unique name of the configuration within the bucket.
+    (Optional) `filter` - Restrict analysis to objects matching a prefix and all specified tags. If omitted, analysis applies to the entire bucket.
+      (Optional) `prefix` - Object key prefix.
+      (Optional) `tags` - A map of object tags to match.
+    (Optional) `data_export` - Export analysis results to an S3 bucket. If omitted, analysis is available without exporting reports. The destination bucket must be in the same AWS region and its policy must allow Amazon S3 to write reports; this module does not manage the destination policy.
+      (Required) `bucket_arn` - ARN of the destination bucket.
+      (Optional) `bucket_account_id` - Account ID of the destination bucket owner.
+      (Optional) `prefix` - Prefix for exported reports.
+      (Optional) `format` - Export format. Only `CSV` is supported. Defaults to `CSV`.
+      (Optional) `output_schema_version` - Export schema version. Only `V_1` is supported. Defaults to `V_1`.
+  EOF
+  type = list(object({
+    name = string
+    filter = optional(object({
+      prefix = optional(string)
+      tags   = optional(map(string), {})
+    }))
+    data_export = optional(object({
+      bucket_arn            = string
+      bucket_account_id     = optional(string)
+      prefix                = optional(string)
+      format                = optional(string, "CSV")
+      output_schema_version = optional(string, "V_1")
+    }))
+  }))
+  default  = []
+  nullable = false
+
+  validation {
+    condition = alltrue([
+      for configuration in var.analytics_configurations :
+      trimspace(configuration.name) != ""
+    ]) && length(distinct(var.analytics_configurations[*].name)) == length(var.analytics_configurations)
+    error_message = "Analytics configuration names must be non-empty and unique."
+  }
+  validation {
+    condition = alltrue([
+      for configuration in var.analytics_configurations :
+      configuration.data_export == null ? true : configuration.data_export.format == "CSV" && configuration.data_export.output_schema_version == "V_1"
+    ])
+    error_message = "Analytics data export supports only the CSV format and V_1 output schema version."
+  }
+}
+
 variable "request_metrics" {
   description = <<EOF
   (Optional) A list of CORS (Cross-Origin Resource Sharing) rules for the bucket. You can configure up to 100 rules. Each value of `cors_rules` as defined below.

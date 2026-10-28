@@ -187,6 +187,24 @@ output "logging" {
   }
 }
 
+output "analytics_configurations" {
+  description = "The Storage Class Analysis configurations by name."
+  value = {
+    for name, configuration in aws_s3_bucket_analytics_configuration.this :
+    name => {
+      id     = configuration.id
+      filter = one(configuration.filter[*])
+      data_export = try({
+        bucket_arn            = configuration.storage_class_analysis[0].data_export[0].destination[0].s3_bucket_destination[0].bucket_arn
+        bucket_account_id     = configuration.storage_class_analysis[0].data_export[0].destination[0].s3_bucket_destination[0].bucket_account_id
+        prefix                = configuration.storage_class_analysis[0].data_export[0].destination[0].s3_bucket_destination[0].prefix
+        format                = configuration.storage_class_analysis[0].data_export[0].destination[0].s3_bucket_destination[0].format
+        output_schema_version = configuration.storage_class_analysis[0].data_export[0].output_schema_version
+      }, null)
+    }
+  }
+}
+
 output "monitoring" {
   description = "The monitoring configuration for the bucket."
   value = {
