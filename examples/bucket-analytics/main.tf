@@ -10,13 +10,10 @@ resource "random_string" "this" {
 }
 
 data "aws_caller_identity" "this" {}
-data "aws_partition" "this" {}
 
 locals {
   bucket_name  = "analytics-${random_string.this.id}"
   reports_name = "analytics-reports-${random_string.this.id}"
-  bucket_arn   = "arn:${data.aws_partition.this.partition}:s3:::${local.bucket_name}"
-  reports_arn  = "arn:${data.aws_partition.this.partition}:s3:::${local.reports_name}"
 }
 
 # Analytics exports require a destination in the same region with a policy
@@ -27,25 +24,18 @@ module "reports" {
   name          = local.reports_name
   force_destroy = true
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Sid       = "AllowAnalyticsReports"
-      Effect    = "Allow"
-      Principal = { Service = "s3.amazonaws.com" }
-      Action    = "s3:PutObject"
-      Resource  = "${local.reports_arn}/analytics/*"
-      Condition = {
-        ArnEquals = {
-          "aws:SourceArn" = local.bucket_arn
-        }
-        StringEquals = {
-          "aws:SourceAccount" = data.aws_caller_identity.this.account_id
-          "s3:x-amz-acl"      = "bucket-owner-full-control"
-        }
-      }
-    }]
-  })
+  # This entry also analyzes the reports bucket; it does not export its analysis.
+  analytics_rules = [{
+    name = "reports"
+    data_export = {
+      is_target_bucket = true
+      allowed_source_buckets = [{
+        name                  = local.bucket_name
+        key_prefix            = "analytics/"
+        expected_bucket_owner = data.aws_caller_identity.this.account_id
+      }]
+    }
+  }]
 
   tags = {
     "project" = "terraform-aws-s3-examples"
@@ -58,7 +48,7 @@ module "bucket" {
   name          = local.bucket_name
   force_destroy = true
 
-  analytics_configurations = [
+  analytics_rules = [
     { name = "entire-bucket" },
     {
       name = "documents"
@@ -67,9 +57,12 @@ module "bucket" {
         tags   = { classification = "archive" }
       }
       data_export = {
-        bucket_arn        = module.reports.arn
-        bucket_account_id = data.aws_caller_identity.this.account_id
-        prefix            = "analytics/"
+        enabled = true
+        s3_bucket = {
+          name                  = local.reports_name
+          key_prefix            = "analytics/"
+          expected_bucket_owner = data.aws_caller_identity.this.account_id
+        }
       }
     },
   ]

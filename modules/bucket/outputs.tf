@@ -187,20 +187,26 @@ output "logging" {
   }
 }
 
-output "analytics_configurations" {
-  description = "The Storage Class Analysis configurations by name."
+output "analytics_rules" {
+  description = "The Storage Class Analysis rules by name."
   value = {
-    for name, configuration in aws_s3_bucket_analytics_configuration.this :
+    for name, rule in aws_s3_bucket_analytics_configuration.this :
     name => {
-      id     = configuration.id
-      filter = one(configuration.filter[*])
-      data_export = try({
-        bucket_arn            = configuration.storage_class_analysis[0].data_export[0].destination[0].s3_bucket_destination[0].bucket_arn
-        bucket_account_id     = configuration.storage_class_analysis[0].data_export[0].destination[0].s3_bucket_destination[0].bucket_account_id
-        prefix                = configuration.storage_class_analysis[0].data_export[0].destination[0].s3_bucket_destination[0].prefix
-        format                = configuration.storage_class_analysis[0].data_export[0].destination[0].s3_bucket_destination[0].format
-        output_schema_version = configuration.storage_class_analysis[0].data_export[0].output_schema_version
-      }, null)
+      id     = rule.id
+      name   = rule.name
+      filter = one(rule.filter[*])
+      data_export = {
+        enabled = length(rule.storage_class_analysis) > 0
+        s3_bucket = try({
+          name                  = local.analytics_rules[name].data_export.s3_bucket.name
+          key_prefix            = rule.storage_class_analysis[0].data_export[0].destination[0].s3_bucket_destination[0].prefix
+          expected_bucket_owner = rule.storage_class_analysis[0].data_export[0].destination[0].s3_bucket_destination[0].bucket_account_id
+        }, null)
+        format                 = local.analytics_rules[name].data_export.format
+        schema_version         = local.analytics_rules[name].data_export.schema_version
+        is_target_bucket       = local.analytics_rules[name].data_export.is_target_bucket
+        allowed_source_buckets = local.analytics_rules[name].data_export.allowed_source_buckets
+      }
     }
   }
 }

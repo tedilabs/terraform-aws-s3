@@ -682,19 +682,27 @@ variable "logging" {
   }
 }
 
-variable "analytics_configurations" {
+variable "analytics_rules" {
   description = <<EOF
-  (Optional) A list of S3 Storage Class Analysis configurations.
-    (Required) `name` - Unique name of the configuration within the bucket.
-    (Optional) `filter` - Restrict analysis to objects matching a prefix and all specified tags. If omitted, analysis applies to the entire bucket.
+  (Optional) A list of S3 Storage Class Analysis rules. Each entry creates an analysis rule, including entries configured to receive exports.
+    (Required) `name` - Unique name of the rule within the bucket.
+    (Optional) `filter` - Restrict analysis to objects matching a prefix and all specified tags. Omitted or empty filters apply to the entire bucket.
       (Optional) `prefix` - Object key prefix.
       (Optional) `tags` - A map of object tags to match.
-    (Optional) `data_export` - Export analysis results to an S3 bucket. If omitted, analysis is available without exporting reports. The destination bucket must be in the same AWS region and its policy must allow Amazon S3 to write reports; this module does not manage the destination policy.
-      (Required) `bucket_arn` - ARN of the destination bucket.
-      (Optional) `bucket_account_id` - Account ID of the destination bucket owner.
-      (Optional) `prefix` - Prefix for exported reports.
+    (Optional) `data_export` - Configure outgoing reports and incoming report permissions independently.
+      (Optional) `enabled` - Whether to export this rule's analysis results. Defaults to `false`.
+      (Optional) `s3_bucket` - Destination bucket. Required when `enabled` is `true`. Must be in the same AWS region and allow Amazon S3 to write reports.
+        (Required) `name` - Destination bucket name.
+        (Optional) `key_prefix` - Object key prefix for exported reports.
+        (Optional) `expected_bucket_owner` - Destination bucket owner's account ID. Maps to the provider's `bucket_account_id` argument.
       (Optional) `format` - Export format. Only `CSV` is supported. Defaults to `CSV`.
-      (Optional) `output_schema_version` - Export schema version. Only `V_1` is supported. Defaults to `V_1`.
+      (Optional) `schema_version` - Export schema version. Only `V_1` is supported. Defaults to `V_1`.
+      (Optional) `is_target_bucket` - Whether to add a policy to this module's bucket allowing incoming Analytics exports. Independent of `enabled`. Defaults to `false`.
+      (Optional) `allowed_source_buckets` - Source buckets allowed to write reports. Must be non-empty when `is_target_bucket` is `true`.
+        (Required) `name` - Source bucket name.
+        (Optional) `key_prefix` - Allowed report object key prefix in this target bucket. If omitted, permits writes throughout this bucket. Match the source rule's destination `key_prefix`.
+        (Optional) `expected_bucket_owner` - Source bucket owner's account ID. Defaults to the current AWS account. Specify explicitly for cross-account sources.
+    Export policies grant only report writes. Customer managed KMS keys require a separate key policy granting Amazon S3 encryption permissions.
   EOF
   type = list(object({
     name = string
@@ -703,29 +711,56 @@ variable "analytics_configurations" {
       tags   = optional(map(string), {})
     }))
     data_export = optional(object({
-      bucket_arn            = string
-      bucket_account_id     = optional(string)
-      prefix                = optional(string)
-      format                = optional(string, "CSV")
-      output_schema_version = optional(string, "V_1")
-    }))
+      enabled = optional(bool, false)
+      s3_bucket = optional(object({
+        name                  = string
+        key_prefix            = optional(string)
+        expected_bucket_owner = optional(string)
+      }))
+      format           = optional(string, "CSV")
+      schema_version   = optional(string, "V_1")
+      is_target_bucket = optional(bool, false)
+      allowed_source_buckets = optional(list(object({
+        name                  = string
+        key_prefix            = optional(string)
+        expected_bucket_owner = optional(string)
+      })), [])
+    }), {})
   }))
   default  = []
   nullable = false
 
   validation {
     condition = alltrue([
-      for configuration in var.analytics_configurations :
-      trimspace(configuration.name) != ""
-    ]) && length(distinct(var.analytics_configurations[*].name)) == length(var.analytics_configurations)
-    error_message = "Analytics configuration names must be non-empty and unique."
+      for rule in var.analytics_rules : trimspace(rule.name) != ""
+    ]) && length(distinct(var.analytics_rules[*].name)) == length(var.analytics_rules)
+    error_message = "Analytics rule names must be non-empty and unique."
   }
   validation {
     condition = alltrue([
-      for configuration in var.analytics_configurations :
-      configuration.data_export == null ? true : configuration.data_export.format == "CSV" && configuration.data_export.output_schema_version == "V_1"
+      for rule in var.analytics_rules : rule.data_export.format == "CSV" && rule.data_export.schema_version == "V_1"
     ])
-    error_message = "Analytics data export supports only the CSV format and V_1 output schema version."
+    error_message = "Analytics data export supports only the CSV format and V_1 schema version."
+  }
+  validation {
+    condition = alltrue([
+      for rule in var.analytics_rules : rule.data_export.enabled ? try(trimspace(rule.data_export.s3_bucket.name) != "", false) : true
+    ])
+    error_message = "Enabled Analytics exports require s3_bucket with a non-empty name."
+  }
+  validation {
+    condition = alltrue([
+      for rule in var.analytics_rules : rule.data_export.is_target_bucket ? length(rule.data_export.allowed_source_buckets) > 0 : true
+    ])
+    error_message = "Analytics export target buckets require at least one allowed source bucket."
+  }
+  validation {
+    condition = alltrue(flatten([
+      for rule in var.analytics_rules : [
+        for bucket in rule.data_export.allowed_source_buckets : trimspace(bucket.name) != "" && length(regexall("[?*]", bucket.name)) == 0
+      ]
+    ]))
+    error_message = "Allowed Analytics source bucket names must be non-empty and must not contain wildcards."
   }
 }
 
