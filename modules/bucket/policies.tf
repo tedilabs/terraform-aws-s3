@@ -67,10 +67,7 @@ data "aws_iam_policy_document" "access_logging" {
 
 data "aws_iam_policy_document" "analytics_export" {
   dynamic "statement" {
-    for_each = flatten([
-      for rule in var.analytics_rules : rule.data_export.allowed_source_buckets
-      if rule.data_export.is_target_bucket
-    ])
+    for_each = var.analytics.is_target_bucket ? var.analytics.allowed_source_buckets : []
 
     content {
       sid       = "S3AnalyticsExport${statement.key}"

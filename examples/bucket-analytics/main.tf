@@ -24,18 +24,14 @@ module "reports" {
   name          = local.reports_name
   force_destroy = true
 
-  # This entry also analyzes the reports bucket; it does not export its analysis.
-  analytics_rules = [{
-    name = "reports"
-    data_export = {
-      is_target_bucket = true
-      allowed_source_buckets = [{
-        name                  = local.bucket_name
-        key_prefix            = "analytics/"
-        expected_bucket_owner = data.aws_caller_identity.this.account_id
-      }]
-    }
-  }]
+  analytics = {
+    is_target_bucket = true
+    allowed_source_buckets = [{
+      name                  = local.bucket_name
+      key_prefix            = "analytics/"
+      expected_bucket_owner = data.aws_caller_identity.this.account_id
+    }]
+  }
 
   tags = {
     "project" = "terraform-aws-s3-examples"
@@ -48,24 +44,26 @@ module "bucket" {
   name          = local.bucket_name
   force_destroy = true
 
-  analytics_rules = [
-    { name = "entire-bucket" },
-    {
-      name = "documents"
-      filter = {
-        prefix = "documents/"
-        tags   = { classification = "archive" }
-      }
-      data_export = {
-        enabled = true
-        s3_bucket = {
-          name                  = local.reports_name
-          key_prefix            = "analytics/"
-          expected_bucket_owner = data.aws_caller_identity.this.account_id
+  analytics = {
+    rules = [
+      { name = "entire-bucket" },
+      {
+        name = "documents"
+        filter = {
+          prefix = "documents/"
+          tags   = { classification = "archive" }
         }
-      }
-    },
-  ]
+        data_export = {
+          enabled = true
+          s3_bucket = {
+            name                  = local.reports_name
+            key_prefix            = "analytics/"
+            expected_bucket_owner = data.aws_caller_identity.this.account_id
+          }
+        }
+      },
+    ]
+  }
 
   tags = {
     "project" = "terraform-aws-s3-examples"

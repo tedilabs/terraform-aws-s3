@@ -3,7 +3,7 @@
 ###################################################
 
 locals {
-  analytics_rules = { for rule in var.analytics_rules : rule.name => rule }
+  analytics_rules = { for rule in var.analytics.rules : rule.name => rule }
 }
 
 resource "aws_s3_bucket_analytics_configuration" "this" {
