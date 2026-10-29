@@ -742,9 +742,16 @@ variable "analytics" {
   validation {
     condition = alltrue([
       for rule in var.analytics.rules :
-      rule.data_export.format == "CSV" && rule.data_export.schema_version == "V_1"
+      rule.data_export.format == "CSV"
     ])
-    error_message = "Analytics data export supports only the CSV format and V_1 schema version."
+    error_message = "Analytics data export supports only the CSV format."
+  }
+  validation {
+    condition = alltrue([
+      for rule in var.analytics.rules :
+      rule.data_export.schema_version == "V_1"
+    ])
+    error_message = "Analytics data export supports only the V_1 schema version."
   }
   validation {
     condition = alltrue([
