@@ -63,3 +63,38 @@ data "aws_iam_policy_document" "access_logging" {
     }
   }
 }
+
+
+data "aws_iam_policy_document" "analytics_export" {
+  dynamic "statement" {
+    for_each = var.analytics.is_target_bucket ? var.analytics.allowed_source_buckets : []
+
+    content {
+      sid       = "S3AnalyticsExport${statement.key}"
+      effect    = "Allow"
+      actions   = ["s3:PutObject"]
+      resources = ["arn:aws:s3:::${var.name}/${statement.value.key_prefix != null ? statement.value.key_prefix : ""}*"]
+
+      principals {
+        type        = "Service"
+        identifiers = ["s3.amazonaws.com"]
+      }
+
+      condition {
+        test     = "ArnEquals"
+        variable = "aws:SourceArn"
+        values   = ["arn:aws:s3:::${statement.value.name}"]
+      }
+      condition {
+        test     = "StringEquals"
+        variable = "aws:SourceAccount"
+        values   = [coalesce(statement.value.expected_bucket_owner, local.account_id)]
+      }
+      condition {
+        test     = "StringEquals"
+        variable = "s3:x-amz-acl"
+        values   = ["bucket-owner-full-control"]
+      }
+    }
+  }
+}

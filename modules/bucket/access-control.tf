@@ -39,6 +39,7 @@ data "aws_iam_policy_document" "this" {
   source_policy_documents = concat(
     var.tls_required ? [data.aws_iam_policy_document.tls_required.json] : [],
     var.logging.is_target_bucket ? [data.aws_iam_policy_document.access_logging.json] : [],
+    var.analytics.is_target_bucket ? [data.aws_iam_policy_document.analytics_export.json] : [],
   )
   override_policy_documents = var.policy != null ? [var.policy] : null
 }

@@ -187,6 +187,32 @@ output "logging" {
   }
 }
 
+output "analytics" {
+  description = "The Storage Class Analysis rules by name and report delivery permissions for the bucket."
+  value = {
+    rules = {
+      for name, rule in aws_s3_bucket_analytics_configuration.this :
+      name => {
+        id     = rule.id
+        name   = rule.name
+        filter = one(rule.filter[*])
+        data_export = {
+          enabled = length(rule.storage_class_analysis) > 0
+          s3_bucket = try({
+            name                  = local.analytics_rules[name].data_export.s3_bucket.name
+            key_prefix            = rule.storage_class_analysis[0].data_export[0].destination[0].s3_bucket_destination[0].prefix
+            expected_bucket_owner = rule.storage_class_analysis[0].data_export[0].destination[0].s3_bucket_destination[0].bucket_account_id
+          }, null)
+          format         = local.analytics_rules[name].data_export.format
+          schema_version = local.analytics_rules[name].data_export.schema_version
+        }
+      }
+    }
+    is_target_bucket       = var.analytics.is_target_bucket
+    allowed_source_buckets = var.analytics.allowed_source_buckets
+  }
+}
+
 output "monitoring" {
   description = "The monitoring configuration for the bucket."
   value = {
