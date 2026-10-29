@@ -734,19 +734,22 @@ variable "analytics" {
 
   validation {
     condition = alltrue([
-      for rule in var.analytics.rules : trimspace(rule.name) != ""
+      for rule in var.analytics.rules :
+      trimspace(rule.name) != ""
     ]) && length(distinct(var.analytics.rules[*].name)) == length(var.analytics.rules)
     error_message = "Analytics rule names must be non-empty and unique."
   }
   validation {
     condition = alltrue([
-      for rule in var.analytics.rules : rule.data_export.format == "CSV" && rule.data_export.schema_version == "V_1"
+      for rule in var.analytics.rules :
+      rule.data_export.format == "CSV" && rule.data_export.schema_version == "V_1"
     ])
     error_message = "Analytics data export supports only the CSV format and V_1 schema version."
   }
   validation {
     condition = alltrue([
-      for rule in var.analytics.rules : rule.data_export.enabled ? try(trimspace(rule.data_export.s3_bucket.name) != "", false) : true
+      for rule in var.analytics.rules :
+      rule.data_export.enabled ? try(trimspace(rule.data_export.s3_bucket.name) != "", false) : true
     ])
     error_message = "Enabled Analytics exports require s3_bucket with a non-empty name."
   }
@@ -756,7 +759,8 @@ variable "analytics" {
   }
   validation {
     condition = alltrue([
-      for bucket in var.analytics.allowed_source_buckets : trimspace(bucket.name) != "" && length(regexall("[?*]", bucket.name)) == 0
+      for bucket in var.analytics.allowed_source_buckets :
+      trimspace(bucket.name) != "" && length(regexall("[?*]", bucket.name)) == 0
     ])
     error_message = "Allowed Analytics source bucket names must be non-empty and must not contain wildcards."
   }

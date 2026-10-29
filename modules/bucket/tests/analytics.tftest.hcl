@@ -172,8 +172,14 @@ run "target_policies" {
   assert {
     condition = (
       length(jsondecode(aws_s3_bucket_policy.this.policy).Statement) == 5 &&
-      contains([for statement in jsondecode(aws_s3_bucket_policy.this.policy).Statement : statement.Sid], "CustomRead") &&
-      contains([for statement in jsondecode(aws_s3_bucket_policy.this.policy).Statement : statement.Sid], "RequireTlsForRequest") &&
+      contains([
+        for statement in jsondecode(aws_s3_bucket_policy.this.policy).Statement :
+        statement.Sid
+      ], "CustomRead") &&
+      contains([
+        for statement in jsondecode(aws_s3_bucket_policy.this.policy).Statement :
+        statement.Sid
+      ], "RequireTlsForRequest") &&
       output.analytics.is_target_bucket &&
       length(output.analytics.allowed_source_buckets) == 3 &&
       length(output.analytics.rules) == 0 &&
