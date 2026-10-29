@@ -18,7 +18,13 @@ resource "aws_s3_bucket_analytics_configuration" "this" {
   name   = each.key
 
   dynamic "filter" {
-    for_each = each.value.filter != null ? (try(length(each.value.filter.prefix), 0) > 0 || length(each.value.filter.tags) > 0 ? [each.value.filter] : []) : []
+    for_each = (each.value.filter != null
+      ? (anytrue([
+        each.value.filter.prefix != null && each.value.filter.prefix != "",
+        length(each.value.filter.tags) > 0,
+      ]) ? [each.value.filter] : [])
+      : []
+    )
 
     content {
       prefix = filter.value.prefix
