@@ -69,7 +69,7 @@ variable "resource_group" {
 variable "shares" {
   description = <<EOF
   (Optional) A list of resource shares via RAM (Resource Access Manager). `shares` as defined below.
-    (Optional) `name` - The name of the resource share.
+    (Required) `name` - The name of the resource share.
     (Optional) `permissions` - A set of AWS RAM managed permissions to associate with the resource share. Defaults to `AWSRAMPermissionAccessGrantsData`. The following permissions are available for S3 Access Grants:
       `AWSRAMPermissionAccessGrantsData` - Allows principals to request data access credentials and find or list the grants available to the caller. Use this default permission when consumers only need to access data through S3 Access Grants.
       `AWSRAMPermissionAccessGrantsReadAccess` - Includes the data access permissions and allows principals to list all grants and registered locations in the shared instance. Use this when consumers need data access and read-only visibility into the instance configuration.
@@ -79,7 +79,7 @@ variable "shares" {
     (Optional) `tags` - A map of tags to add to the resource share. Defaults to `{}`.
   EOF
   type = list(object({
-    name = optional(string)
+    name = string
 
     permissions = optional(set(string), ["AWSRAMPermissionAccessGrantsData"])
 
