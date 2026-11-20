@@ -24,7 +24,7 @@ resource "aws_s3_bucket_logging" "this" {
 
   target_object_key_format {
     dynamic "partitioned_prefix" {
-      for_each = contains(["SIMPLE", "PARTITIONED_BY_DELIVERY_TIME", "PARTITIONED_BY_EVENT_TIME"], var.logging.s3_key_format) ? ["go"] : []
+      for_each = contains(["PARTITIONED_BY_DELIVERY_TIME", "PARTITIONED_BY_EVENT_TIME"], var.logging.s3_key_format) ? ["go"] : []
 
       content {
         partition_date_source = local.logging_partition_date_sources[var.logging.s3_key_format]
