@@ -57,11 +57,7 @@ module "replication_iam_role" {
         - "s3:ReplicateDelete"
         - "s3:ReplicateTags"
         # Destinations
-        Resource: [
-        %{for bucket in toset(var.replication_rules[*].destination.bucket)}
-          ${provider::aws::arn_build("aws", "s3", "", "", bucket)}/*
-        %{endfor}
-        ]
+        Resource: ${jsonencode([for bucket in toset(var.replication_rules[*].destination.bucket) : "${provider::aws::arn_build("aws", "s3", "", "", bucket)}/*"])}
     EOF
     ))
   }, var.default_replication_iam_role.inline_policies)
