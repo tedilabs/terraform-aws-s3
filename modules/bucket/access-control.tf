@@ -45,6 +45,12 @@ data "aws_iam_policy_document" "this" {
 }
 
 resource "aws_s3_bucket_policy" "this" {
+  count = (var.tls_required
+    || var.logging.is_target_bucket
+    || var.analytics.is_target_bucket
+    || var.policy != null
+  ) ? 1 : 0
+
   region = var.region
 
   bucket = aws_s3_bucket.this.id
