@@ -55,7 +55,7 @@ This module creates following resources.
 | ---- | ----------- |
 | <a name="output_alias"></a> [alias](#output\_alias) | The alias of the S3 Access Point. |
 | <a name="output_arn"></a> [arn](#output\_arn) | The ARN of the S3 Access Point. |
-| <a name="output_block_public_access"></a> [block\_public\_access](#output\_block\_public\_access) | The configuration for the S3 bucket access control. |
+| <a name="output_block_public_access"></a> [block\_public\_access](#output\_block\_public\_access) | The configuration for the Block Public Access of the S3 access point. |
 | <a name="output_bucket"></a> [bucket](#output\_bucket) | The bucket associated with this Access Point. |
 | <a name="output_domain_name"></a> [domain\_name](#output\_domain\_name) | The DNS domain name of the S3 Access Point in the format `{name-account_id}.s3-accesspoint.{region}.amazonaws.com`. Note: S3 access points only support secure access by HTTPS. HTTP isn't supported. |
 | <a name="output_endpoints"></a> [endpoints](#output\_endpoints) | The VPC endpoints for the S3 Access Point. |

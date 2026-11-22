@@ -21,7 +21,7 @@ variable "force_destroy" {
 variable "encryption" {
   description = <<EOF
   (Optional) A configuration of Server-Side Encryption for the S3 bucket.
-    (Optional) `type` - The server-side encryption algorithm to use. Valid values are `AES256` and `AWS_KMS`. Defaults to `AES256`.
+    (Optional) `type` - The server-side encryption algorithm to use. Valid values are `AES256`, `AWS_KMS`, and `AWS_KMS_DSSE`. Defaults to `AES256`.
     (Optional) `kms_key` - The AWS KMS key ID used for the `SSE-KMS` encryption. This can only be used when you set the value of `encryption.type` as `AWS_KMS` or `AWS_KMS_DSSE`. The default `aws/s3` AWS KMS key is used if this element is absent while the `encryption.type` is `AWS_KMS` or `AWS_KMS_DSSE`.
     (Optional) `blocked_encryption_types` - A set of server-side encryption types to block for object uploads. Valid values are `SSE-C` and `NONE`.
       `SSE-C` - Blocks uploads that use server-side encryption with customer-provided keys.
@@ -54,7 +54,7 @@ variable "versioning" {
   description = <<EOF
   (Optional) A configuration of Versioning for the S3 bucket.
     (Optional) `status` - A desired status of the bucket versioning. Valid values are `ENABLED`, `SUSPENDED`, or `DISABLED`. Disabled should only be used when creating or importing resources that correspond to unversioned S3 buckets. Defaults to `DISABLED`.
-    (Optional) `mfa_deletion` - A configuration for MFA (Multi-factors Authentication) of the bucket versioning on deletion. MFA(multi-factor authentication) configuration on Lifecycle configuration-enabled bucket is not supported. `versioning_mfa_deletion` block as defined below.
+    (Optional) `mfa_deletion` - A configuration for MFA (Multi-Factor Authentication) of the bucket versioning on deletion. MFA(multi-factor authentication) configuration on Lifecycle configuration-enabled bucket is not supported. `mfa_deletion` block as defined below.
       (Optional) `enabled` - Whether MFA delete is enabled in the bucket versioning configuration. Default is `false`.
       (Optional) `device` - The concatenation of the authentication device's serial number, a space, and the value that is displayed on your authentication device.
   EOF

@@ -60,7 +60,7 @@ output "endpoints" {
 }
 
 output "block_public_access" {
-  description = "The configuration for the S3 bucket access control."
+  description = "The configuration for the Block Public Access of the S3 access point."
   value = {
     block_public_acls_enabled       = one(aws_s3_access_point.this.public_access_block_configuration[*]).block_public_acls
     ignore_public_acls_enabled      = one(aws_s3_access_point.this.public_access_block_configuration[*]).ignore_public_acls
