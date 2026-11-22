@@ -127,7 +127,7 @@ resource "aws_s3_bucket_public_access_block" "this" {
   # Block new public bucket policies
   block_public_policy = (var.block_public_access.enabled
   || var.block_public_access.block_public_policy_enabled)
-  # Retroactivley block public and cross-account access if bucket has public policies
+  # Retroactively block public and cross-account access if bucket has public policies
   restrict_public_buckets = (var.block_public_access.enabled
   || var.block_public_access.restrict_public_buckets_enabled)
 
