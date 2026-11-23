@@ -20,7 +20,7 @@ variable "force_destroy" {
 
 variable "encryption" {
   description = <<EOF
-  (Optional) A configurations of Server-Side Encryption for the S3 bucket.
+  (Optional) A configuration of Server-Side Encryption for the S3 bucket.
     (Optional) `type` - The server-side encryption algorithm to use. Valid values are `AES256` and `AWS_KMS`. Defaults to `AES256`.
     (Optional) `kms_key` - The AWS KMS key ID used for the `SSE-KMS` encryption. This can only be used when you set the value of `encryption.type` as `AWS_KMS` or `AWS_KMS_DSSE`. The default `aws/s3` AWS KMS key is used if this element is absent while the `encryption.type` is `AWS_KMS` or `AWS_KMS_DSSE`.
     (Optional) `blocked_encryption_types` - A set of server-side encryption types to block for object uploads. Valid values are `SSE-C` and `NONE`.
@@ -52,7 +52,7 @@ variable "encryption" {
 
 variable "versioning" {
   description = <<EOF
-  (Optional) A configurations of Versioning for the S3 bucket.
+  (Optional) A configuration of Versioning for the S3 bucket.
     (Optional) `status` - A desired status of the bucket versioning. Valid values are `ENABLED`, `SUSPENDED`, or `DISABLED`. Disabled should only be used when creating or importing resources that correspond to unversioned S3 buckets. Defaults to `DISABLED`.
     (Optional) `mfa_deletion` - A configuration for MFA (Multi-factors Authentication) of the bucket versioning on deletion. MFA(multi-factor authentication) configuration on Lifecycle configuration-enabled bucket is not supported. `versioning_mfa_deletion` block as defined below.
       (Optional) `enabled` - Whether MFA delete is enabled in the bucket versioning configuration. Default is `false`.
@@ -81,7 +81,7 @@ variable "versioning" {
 
 variable "object_lock" {
   description = <<EOF
-  (Optional) A configurations of Object Lock for the S3 bucket.
+  (Optional) A configuration of Object Lock for the S3 bucket.
     (Optional) `enabled` - Whether to enable Object Lock for the S3 bucket. Defaults to `false`.
     (Optional) `default_retention` - Specify the default Object Lock retention settings for new objects placed in the bucket. `default_retention` block as defined below.
       (Required) `mode` - The default Object Lock retention mode you want to apply to new objects placed in the specified bucket. Valid values are `COMPLIANCE`, `GOVERNANCE`. Defaults to `GOVERNANCE`.
@@ -106,13 +106,13 @@ variable "object_lock" {
         contains(["DAYS", "YEARS"], var.object_lock.default_retention.unit),
       ])
     )
-    error_message = "Valid values for `object_lock.default_retention.mode` are `COMPLIANCE` and `GOVERNANCE`. Valid values for `object_lock.default_retention.unit are `DAYS` and `YEARS`."
+    error_message = "Valid values for `object_lock.default_retention.mode` are `COMPLIANCE` and `GOVERNANCE`. Valid values for `object_lock.default_retention.unit` are `DAYS` and `YEARS`."
   }
 }
 
 variable "objects" {
   description = <<EOF
-  (Optional) A configurations of the objects to upload to the S3 bucket. Objects are uploaded from local files or inline contents with the bucket creation. `objects` as defined below.
+  (Optional) A configuration of the objects to upload to the S3 bucket. Objects are uploaded from local files or inline contents with the bucket creation. `objects` as defined below.
     (Optional) `files` - A list of files to upload to the S3 bucket. Each file is uploaded as an object from a local file or an inline content. Each object key takes precedence over objects from `objects.directories` when the object keys conflict. Each value of `files` as defined below.
       (Required) `key` - The full key (path) of the object in the S3 bucket. The key must be unique within `files`.
       (Optional) `source` - The path to a local file that will be uploaded as the object content. Exactly one of `source` or `content` must be provided. The object is automatically re-uploaded when the content of the file changes.
@@ -140,14 +140,14 @@ variable "objects" {
       (Optional) `metadata` - A map of keys/values to provision metadata for the objects. Metadata keys are always converted to lowercase by AWS.
       (Optional) `tags` - A map of tags to add to the objects.
     (Optional) `force_destroy` - Whether to allow the objects to be deleted while the bucket has a legal hold on the objects. Defaults to `false`.
-    (Optional) `checksum` - A configurations of the additional checksum for the objects. The checksum is calculated on upload, stored with the objects, and used by S3 to verify the integrity of the object data. `checksum` as defined below.
+    (Optional) `checksum` - A configuration of the additional checksum for the objects. The checksum is calculated on upload, stored with the objects, and used by S3 to verify the integrity of the object data. `checksum` as defined below.
       (Optional) `enabled` - Whether to calculate an additional checksum for the objects. Defaults to `true`.
       (Optional) `algorithm` - The algorithm used to create the checksum for the objects. Valid values are `CRC32`, `CRC32C`, `CRC64NVME`, `SHA1` and `SHA256`. Defaults to `CRC32`. If the objects are encrypted with SSE-KMS (`aws:kms`), the IAM identity running Terraform must be allowed to perform the `kms:Decrypt` action on the KMS key, because S3 requires it to read the checksum back from a SSE-KMS encrypted object.
-    (Optional) `encryption` - A configurations of Server-Side Encryption for the objects. Each attribute only overrides the default encryption configuration of the bucket when explicitly provided. If not provided, the objects follow the default encryption configuration of the bucket. `encryption` as defined below.
+    (Optional) `encryption` - A configuration of Server-Side Encryption for the objects. Each attribute only overrides the default encryption configuration of the bucket when explicitly provided. If not provided, the objects follow the default encryption configuration of the bucket. `encryption` as defined below.
       (Optional) `type` - The server-side encryption algorithm to use for the objects. Valid values are `AES256`, `AWS_KMS` and `AWS_KMS_DSSE`. If not provided, the default encryption type of the bucket is applied.
       (Optional) `kms_key` - The ARN of the AWS KMS key used for the `SSE-KMS` encryption. This can only be used when the value of `encryption.type` is `AWS_KMS` or `AWS_KMS_DSSE`. The default encryption KMS key of the bucket or the AWS managed `aws/s3` KMS key is used if this element is absent.
       (Optional) `bucket_key_enabled` - Whether or not to use Amazon S3 Bucket Keys for SSE-KMS. If not provided, the default Bucket Keys configuration of the bucket is applied.
-    (Optional) `object_lock` - A configurations of Object Lock for the objects. Object Lock must be enabled on the bucket with versioning to use these settings. To delete the objects locked by a legal hold or a retention via Terraform, `objects.force_destroy` must be enabled. `object_lock` as defined below.
+    (Optional) `object_lock` - A configuration of Object Lock for the objects. Object Lock must be enabled on the bucket with versioning to use these settings. To delete the objects locked by a legal hold or a retention via Terraform, `objects.force_destroy` must be enabled. `object_lock` as defined below.
       (Optional) `legal_hold_enabled` - Whether to apply a legal hold to the objects. A legal hold protects the objects indefinitely until it is explicitly removed. If not provided, the legal hold status of the objects is not managed. Set to `false` to explicitly remove a legal hold from the existing objects.
       (Optional) `retention` - A configuration of the Object Lock retention for the objects. If not provided, the default Object Lock retention of the bucket is applied. `retention` as defined below.
         (Optional) `mode` - The Object Lock retention mode for the objects. Valid values are `GOVERNANCE` and `COMPLIANCE`. `GOVERNANCE` can be bypassed with the `s3:BypassGovernanceRetention` permission, while `COMPLIANCE` cannot be shortened by anyone including the root user until the retention expires. Defaults to `GOVERNANCE`.
@@ -281,7 +281,7 @@ variable "objects" {
 
 variable "intelligent_tiering_rules" {
   description = <<EOF
-  (Optional) A configurations of Intelligent-Tiering rules for the S3 bucket. These configure optional archive access tiers for objects already in the `INTELLIGENT_TIERING` storage class; use lifecycle rules to transition objects into that storage class. Each value of `intelligent_tiering_rules` as defined below.
+  (Optional) A configuration of Intelligent-Tiering rules for the S3 bucket. These configure optional archive access tiers for objects already in the `INTELLIGENT_TIERING` storage class; use lifecycle rules to transition objects into that storage class. Each value of `intelligent_tiering_rules` as defined below.
     (Required) `name` - Unique name of the configuration within the bucket.
     (Optional) `enabled` - Whether the configuration is enabled. Defaults to `true`.
     (Optional) `filter` - Restrict the configuration to objects matching a prefix and all specified tags. If omitted, the configuration applies to the entire bucket. `filter` block as defined below.
@@ -354,7 +354,7 @@ variable "lifecycle_transition_default_min_object_size_strategy" {
 
 variable "lifecycle_rules" {
   description = <<EOF
-  (Optional) A configurations of Lifecycle Rules for the S3 bucket. Use lifecycle rules to define actions you want Amazon S3 to take during an object's lifetime such as transitioning objects to another storage class, archiving them, or deleting them after a specified period of time. Each value of `lifecycle_rules` as defined below.
+  (Optional) A configuration of Lifecycle Rules for the S3 bucket. Use lifecycle rules to define actions you want Amazon S3 to take during an object's lifetime such as transitioning objects to another storage class, archiving them, or deleting them after a specified period of time. Each value of `lifecycle_rules` as defined below.
     (Required) `id` - Unique identifier for the rule. The value cannot be longer than 255 characters.
     (Optional) `enabled` - Whether the rule is activated.
     (Optional) `prefix` - The prefix identifying one or more objects to which the rule applies. Defaults to an empty string (`""`) if not specified.
@@ -444,7 +444,7 @@ variable "default_replication_iam_role" {
 
 variable "replication_rules" {
   description = <<EOF
-  (Optional) A configurations of Replication Rules for the S3 bucket. Use replication rules to define actions for automatic replication of objects across different AWS Regions or within the same Region. Each value of `replication_rules` as defined below.
+  (Optional) A configuration of Replication Rules for the S3 bucket. Use replication rules to define actions for automatic replication of objects across different AWS Regions or within the same Region. Each value of `replication_rules` as defined below.
     (Required) `id` - Unique identifier for the rule. Must be less than or equal to 255 characters in length.
     (Optional) `priority` - The priority associated with the rule. Priority must be unique across all replication rules. Defaults to `0`.
     (Optional) `enabled` - Whether the rule is activated. Defaults to `true`.
@@ -528,7 +528,7 @@ variable "replication_rules" {
 
 variable "abac" {
   description = <<EOF
-  (Optional) A configurations of Attribute-Based Access Control (ABAC) for the S3 bucket. `abac` block as defined below.
+  (Optional) A configuration of Attribute-Based Access Control (ABAC) for the S3 bucket. `abac` block as defined below.
     (Optional) `enabled` - Whether to enable ABAC for the S3 bucket. Defaults to `false`.
   EOF
   type = object({
@@ -593,7 +593,7 @@ variable "object_ownership" {
 
 variable "block_public_access" {
   description = <<EOF
-  (Optional) A configurations of Block Public Access for the S3 bucket.
+  (Optional) A configuration of Block Public Access for the S3 bucket.
     (Optional) `enabled` - Whether to block all public access to S3 bucket. Defaults to `true`.
     (Optional) `block_public_acls_enabled` - Block new public ACLs and uploading public objects if true. Always enabled if `block_public_access.enabled` is `true`.
     (Optional) `ignore_public_acls_enabled` - Retroactively remove public access granted through public ACLs. Always enabled if `block_public_access.enabled` is `true`.
@@ -653,7 +653,7 @@ variable "tls_required" {
 
 variable "logging" {
   description = <<EOF
-  (Optional) A configurations of Server Access Logging for the S3 bucket.
+  (Optional) A configuration of Server Access Logging for the S3 bucket.
     (Optional) `enabled` - Whether to enable S3 bucket logging for the access log. Defaults to `false`.
     (Optional) `s3_bucket` - The name of the bucket to deliver logs to.
     (Optional) `s3_key_prefix` - The key prefix to append to log objects.
@@ -828,7 +828,7 @@ variable "tags" {
 }
 
 variable "module_tags_enabled" {
-  description = "(Optional) Whether to create AWS Resource Tags for the module informations."
+  description = "(Optional) Whether to create AWS Resource Tags for the module information."
   type        = bool
   default     = true
   nullable    = false
@@ -841,7 +841,7 @@ variable "module_tags_enabled" {
 
 variable "resource_group" {
   description = <<EOF
-  (Optional) A configurations of Resource Group for this module. `resource_group` as defined below.
+  (Optional) A configuration of Resource Group for this module. `resource_group` as defined below.
     (Optional) `enabled` - Whether to create Resource Group to find and group AWS resources which are created by this module. Defaults to `true`.
     (Optional) `name` - The name of Resource Group. A Resource Group name can have a maximum of 127 characters, including letters, numbers, hyphens, dots, and underscores. The name cannot start with `AWS` or `aws`. If not provided, a name will be generated using the module name and instance name.
     (Optional) `description` - The description of Resource Group. Defaults to `Managed by Terraform.`.

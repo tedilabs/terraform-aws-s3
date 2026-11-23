@@ -25,7 +25,7 @@ variable "force_destroy" {
 
 variable "encryption" {
   description = <<EOF
-  (Optional) A configurations of Server-Side Encryption for the S3 table bucket. `encryption` as defined below.
+  (Optional) A configuration of Server-Side Encryption for the S3 table bucket. `encryption` as defined below.
     (Optional) `type` - The server-side encryption algorithm to use. Valid values are `AES256` and `AWS_KMS`. Defaults to `AES256`.
     (Optional) `kms_key` - The ARN of the AWS KMS key used for the `SSE-KMS` encryption. This can only be used when you set the value of `encryption.type` as `AWS_KMS`.
   EOF
@@ -44,7 +44,7 @@ variable "encryption" {
 
 variable "maintenance" {
   description = <<EOF
-  (Optional) A configurations of maintenance for the S3 table bucket. If not provided, the maintenance configuration is fully managed by AWS with the service default values. `maintenance` as defined below.
+  (Optional) A configuration of maintenance for the S3 table bucket. If not provided, the maintenance configuration is fully managed by AWS with the service default values. `maintenance` as defined below.
     (Optional) `unreferenced_file_removal` - A configuration for the unreferenced file removal maintenance, which deletes objects that are not referenced by any table snapshot. `unreferenced_file_removal` as defined below.
       (Optional) `enabled` - Whether the unreferenced file removal maintenance is enabled. Defaults to `true`.
       (Required) `unreferenced_days` - The number of days an object must be unreferenced by the table before it is marked for deletion. Must be at least `1`.
@@ -96,7 +96,7 @@ variable "policy" {
 
 variable "replication" {
   description = <<EOF
-  (Optional) A configurations of Replication for the S3 table bucket. Replication applies to all tables in the source table bucket. `replication` as defined below.
+  (Optional) A configuration of Replication for the S3 table bucket. Replication applies to all tables in the source table bucket. `replication` as defined below.
     (Optional) `rules` - A list of replication rules. The service currently supports only one rule per replication configuration. Each value of `rules` as defined below.
       (Required) `destinations` - A set of ARNs of the destination table buckets to replicate source tables to. Each rule supports up to 5 destinations.
     (Optional) `service_role` - The ARN (Amazon Resource Name) of the IAM Role that Amazon S3 assumes when replicating tables. Only required if `replication.default_service_role.enabled` is `false`.
@@ -155,7 +155,7 @@ variable "tags" {
 }
 
 variable "module_tags_enabled" {
-  description = "(Optional) Whether to create AWS Resource Tags for the module informations."
+  description = "(Optional) Whether to create AWS Resource Tags for the module information."
   type        = bool
   default     = true
   nullable    = false
@@ -168,7 +168,7 @@ variable "module_tags_enabled" {
 
 variable "resource_group" {
   description = <<EOF
-  (Optional) A configurations of Resource Group for this module. `resource_group` as defined below.
+  (Optional) A configuration of Resource Group for this module. `resource_group` as defined below.
     (Optional) `enabled` - Whether to create Resource Group to find and group AWS resources which are created by this module. Defaults to `true`.
     (Optional) `name` - The name of Resource Group. A Resource Group name can have a maximum of 127 characters, including letters, numbers, hyphens, dots, and underscores. The name cannot start with `AWS` or `aws`. If not provided, a name will be generated using the module name and instance name.
     (Optional) `description` - The description of Resource Group. Defaults to `Managed by Terraform.`.
