@@ -598,7 +598,7 @@ variable "block_public_access" {
     (Optional) `block_public_acls_enabled` - Block new public ACLs and uploading public objects if true. Always enabled if `block_public_access.enabled` is `true`.
     (Optional) `ignore_public_acls_enabled` - Retroactively remove public access granted through public ACLs. Always enabled if `block_public_access.enabled` is `true`.
     (Optional) `block_public_policy_enabled` - Block new public bucket policies. Always enabled if `block_public_access.enabled` is `true`.
-    (Optional) `restrict_public_buckets_enabled` - Retroactivley block public and cross-account access if bucket has public policies. Always enabled if `block_public_access.enabled` is `true`.
+    (Optional) `restrict_public_buckets_enabled` - Retroactively block public and cross-account access if bucket has public policies. Always enabled if `block_public_access.enabled` is `true`.
   EOF
   type = object({
     enabled                         = optional(bool, true)
