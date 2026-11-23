@@ -176,6 +176,10 @@ variable "replication" {
   nullable = false
 
   validation {
+    condition     = length(var.replication.rules) <= 1
+    error_message = "Only one rule is supported for `replication.rules`."
+  }
+  validation {
     condition = alltrue([
       for rule in var.replication.rules :
       length(rule.destinations) >= 1 && length(rule.destinations) <= 5
