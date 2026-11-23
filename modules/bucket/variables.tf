@@ -455,9 +455,9 @@ variable "replication_rules" {
       (Optional) `account` - The account ID of the destination bucket owner. Defaults to current account.
       (Optional) `storage_class` - The storage class to use when replicating objects. By default, Amazon S3 uses the storage class of the source object to create the object replica.
     (Optional) `ownership_translation_enabled` - Whether to enable ownership translation. Ownership translation is required when you are replicating objects to a destination bucket owned by a different AWS account. Defaults to `false`.
-    (Optional) `replication_time` - A configuration for S3 Replication Time Control (S3 RTC). `replication_time` block as defined below.
+    (Optional) `replication_time_control` - A configuration for S3 Replication Time Control (S3 RTC). `replication_time_control` block as defined below.
       (Required) `enabled` - Whether S3 Replication Time Control is enabled.
-      (Optional) `minutes` - The time in minutes by which replication should be completed. Valid value is `15`.
+      (Optional) `time_threshold` - The time in minutes by which replication should be completed. Valid value is `15`.
     (Optional) `metrics` - A configuration for replication metrics. With replication metrics, you can monitor the total number and size of objects that are pending replication, and the maximum replication time to the destination Region. You can also view and diagnose replication failures. CloudWatch metrics fees apply. `metrics` block as defined below.
       (Required) `enabled` - Whether replication metrics are enabled. Defaults to `false`.
       (Optional) `time_threshold` - The time threshold in minutes for emitting the `s3:Replication:OperationMissedThreshold` event. Valid value is `15`.
@@ -547,7 +547,8 @@ variable "policy" {
 variable "grants" {
   description = <<EOF
   (Optional) A list of the ACL policy grant. Each value of `grants` as defined below.
-    (Required) `type` - Valid values are `CanonicalUser` and `Group`. `AmazonCustomerByEmail` is not supported.
+    (Required) `type` - Valid values are `CanonicalUser`, `Group`, and `AmazonCustomerByEmail`.
+    (Required) `grantee` - The grantee to grant the permission. The canonical user ID if `type` is `CanonicalUser`, the URI of the group if `type` is `Group`, and the email address if `type` is `AmazonCustomerByEmail`.
     (Required) `permission` - Valid values for `grant.permission` are `READ`, `WRITE`, `READ_ACP`, `WRITE_ACP`, `FULL_CONTROL`.
   EOF
   type = list(object({
@@ -775,7 +776,7 @@ variable "analytics" {
 
 variable "request_metrics" {
   description = <<EOF
-  (Optional) A list of CORS (Cross-Origin Resource Sharing) rules for the bucket. You can configure up to 100 rules. Each value of `cors_rules` as defined below.
+  (Optional) A list of request metrics configurations for the bucket. Each value of `request_metrics` as defined below.
     (Required) `name` - Unique identifier of the metrics configuration for the bucket. Must be less than or equal to 64 characters in length.
     (Optional) `filter` - Object filtering that accepts a prefix, tags, or a logical AND of prefix and tags. `filter` block as defined below.
       (Optional) `access_point` - The access point ARN used when evaluating a metrics filter.
