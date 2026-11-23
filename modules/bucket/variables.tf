@@ -413,6 +413,14 @@ variable "replication_iam_role" {
   type        = string
   default     = null
   nullable    = true
+
+  validation {
+    condition = (length(var.replication_rules) == 0
+      || var.default_replication_iam_role.enabled
+      || var.replication_iam_role != null
+    )
+    error_message = "`replication_iam_role` is required if `default_replication_iam_role.enabled` is `false`."
+  }
 }
 
 variable "default_replication_iam_role" {
